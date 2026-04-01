@@ -4,6 +4,12 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import './GroupList.css';
 
+const SKILL_COLORS = [
+  '#667eea', '#764ba2', '#f093fb', '#f5576c',
+  '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
+  '#fa709a', '#fee140', '#a18cd1', '#fbc2eb'
+];
+
 const GroupList = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -12,6 +18,7 @@ const GroupList = () => {
   const [loading, setLoading] = useState(true);
   const [joinCode, setJoinCode] = useState('');
   const [joining, setJoining] = useState(false);
+  const [requestedGroups, setRequestedGroups] = useState(new Set());
 
   useEffect(() => {
     fetchAllGroups();
@@ -55,14 +62,11 @@ const GroupList = () => {
     }
   };
 
-  const [requestedGroups, setRequestedGroups] = useState(new Set());
-
   const handleRequestJoin = async (groupId) => {
     if (!user) { navigate('/login'); return; }
     try {
       await axios.post(`${process.env.REACT_APP_API_URL}/api/groups/${groupId}/request-join`);
       setRequestedGroups(prev => new Set([...prev, groupId]));
-      alert('Join request sent! Waiting for admin approval.');
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to send request');
     }
@@ -140,8 +144,12 @@ const GroupList = () => {
           <div className="feed-posts">
             {allGroups.map(group => {
               const isMember = myGroupIds.has(group._id);
+              const isRequested = requestedGroups.has(group._id);
+
               return (
                 <article key={group._id} className="feed-post">
+
+                  {/* Post Header */}
                   <div className="post-top">
                     <div className="post-avatar">
                       {group.creatorId?.name?.charAt(0).toUpperCase() || '?'}
@@ -149,51 +157,94 @@ const GroupList = () => {
                     <div className="post-meta">
                       <span className="post-author">{group.creatorId?.name || 'Unknown'}</span>
                       <span className="post-time">
-                        {new Date(group.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {new Date(group.createdAt).toLocaleDateString('en-US', {
+                          month: 'long', day: 'numeric', year: 'numeric'
+                        })}
                       </span>
                     </div>
                     {isMember && <span className="post-member-badge">✓ Member</span>}
                   </div>
 
+                  {/* Title */}
                   <h2 className="post-title">{group.name}</h2>
+
+                  {/* Description */}
                   <p className="post-description">{group.description}</p>
 
+                  {/* Skills */}
                   {group.skills && group.skills.length > 0 && (
                     <div className="post-skills">
-                      <span className="skills-label">🎯 Skills you'll learn:</span>
+                      <span className="skills-label">🎯 Skills you'll learn</span>
                       <div className="skills-tags">
                         {group.skills.map((skill, idx) => (
-                          <span key={idx} className="skill-tag">{skill}</span>
+                          <span
+                            key={idx}
+                            className="skill-tag"
+                            style={{ background: SKILL_COLORS[idx % SKILL_COLORS.length] }}
+                          >
+                            {skill}
+                          </span>
                         ))}
                       </div>
                     </div>
                   )}
 
+                  {/* Price + Duration + Members */}
+                  <div className="post-info-row">
+                    <div className="post-info-item">
+                      <span className="info-icon">💰</span>
+                      <div>
+                        <div className="info-label">Price</div>
+                        <div className="info-value">
+                          {group.price === 0 || !group.price ? (
+                            <span className="free-badge">FREE</span>
+                          ) : (
+                            `₹${group.price}`
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {group.duration && (
+                      <div className="post-info-item">
+                        <span className="info-icon">⏱️</span>
+                        <div>
+                          <div className="info-label">Duration</div>
+                          <div className="info-value">{group.duration}</div>
+                        </div>
+                      </div>
+                    )}
+                    <div className="post-info-item">
+                      <span className="info-icon">👥</span>
+                      <div>
+                        <div className="info-label">Members</div>
+                        <div className="info-value">
+                          {group.memberCount || group.members?.length || 0} / {group.maxMembers}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
                   <div className="post-footer">
-                    <div className="post-stats">
-                      <span>👥 {group.memberCount || group.members?.length || 0} members</span>
-                    </div>
-                    <div className="post-actions">
-                      <Link to={`/groups/${group._id}`} className="btn btn-secondary btn-sm">
-                        View Details
+                    <Link to={`/groups/${group._id}`} className="btn btn-secondary btn-sm">
+                      View Details
+                    </Link>
+                    {isMember ? (
+                      <Link to={`/groups/${group._id}`} className="btn btn-primary btn-sm">
+                        Open Group →
                       </Link>
-                      {isMember ? (
-                        <Link to={`/groups/${group._id}`} className="btn btn-primary btn-sm">
-                          Open Group →
-                        </Link>
-                      ) : requestedGroups.has(group._id) ? (
-                        <button className="btn btn-secondary btn-sm" disabled>
-                          ⏳ Pending Approval
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleRequestJoin(group._id)}
-                          className="btn btn-primary btn-sm"
-                        >
-                          Request to Join
-                        </button>
-                      )}
-                    </div>
+                    ) : isRequested ? (
+                      <button className="btn btn-secondary btn-sm" disabled>
+                        ⏳ Pending Approval
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleRequestJoin(group._id)}
+                        className="btn btn-primary btn-sm"
+                      >
+                        Request to Join
+                      </button>
+                    )}
                   </div>
                 </article>
               );

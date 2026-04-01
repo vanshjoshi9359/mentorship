@@ -15,6 +15,14 @@ const groupSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+  price: {
+    type: Number,
+    default: 0
+  },
+  duration: {
+    type: String,
+    default: ''
+  },
   creatorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
