@@ -36,6 +36,22 @@ const groupSchema = new mongoose.Schema({
       default: 'member'
     }
   }],
+  joinRequests: [{
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    requestedAt: {
+      type: Date,
+      default: Date.now
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'accepted', 'rejected'],
+      default: 'pending'
+    }
+  }],
   topicId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Topic'

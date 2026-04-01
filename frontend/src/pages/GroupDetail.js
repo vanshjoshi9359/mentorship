@@ -28,6 +28,8 @@ const GroupDetail = () => {
     points: 10
   });
 
+  const [joinRequests, setJoinRequests] = useState([]);
+
   useEffect(() => {
     fetchGroupData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,6 +94,27 @@ const GroupDetail = () => {
   const [showCode, setShowCode] = useState(false);
   const [inviteCode, setInviteCode] = useState('');
   const [joinCode, setJoinCode] = useState('');
+
+  const fetchJoinRequests = async () => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/groups/${id}/join-requests`);
+      setJoinRequests(res.data);
+    } catch (error) {
+      console.error('Fetch requests error:', error);
+    }
+  };
+
+  const handleJoinRequest = async (requestId, action) => {
+    try {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/groups/${id}/handle-request`, {
+        requestId, action
+      });
+      setJoinRequests(res.data.pending);
+      if (action === 'accept') fetchGroupData();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to handle request');
+    }
+  };
 
   const handleShowCode = async () => {
     try {
@@ -361,6 +384,14 @@ const GroupDetail = () => {
             >
               👥 Members ({group.members.length})
             </button>
+            {isAdmin && (
+              <button
+                className={`tab ${activeTab === 'requests' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('requests'); fetchJoinRequests(); }}
+              >
+                📬 Requests {joinRequests.length > 0 && `(${joinRequests.length})`}
+              </button>
+            )}
           </div>
 
           {activeTab === 'tasks' && (
@@ -730,6 +761,47 @@ const GroupDetail = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+          {activeTab === 'requests' && isAdmin && (
+            <div className="requests-section">
+              <h2>📬 Join Requests</h2>
+              {joinRequests.length === 0 ? (
+                <div className="empty-state">No pending join requests.</div>
+              ) : (
+                <div className="requests-list">
+                  {joinRequests.map(req => (
+                    <div key={req._id} className="request-item">
+                      <div className="request-info">
+                        <div className="request-avatar">
+                          {req.userId?.name?.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="request-name">{req.userId?.name}</div>
+                          <div className="request-email">{req.userId?.email}</div>
+                          <div className="request-time">
+                            {new Date(req.requestedAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="request-actions">
+                        <button
+                          onClick={() => handleJoinRequest(req._id, 'accept')}
+                          className="btn btn-primary btn-sm"
+                        >
+                          ✓ Accept
+                        </button>
+                        <button
+                          onClick={() => handleJoinRequest(req._id, 'reject')}
+                          className="btn btn-secondary btn-sm"
+                        >
+                          ✕ Reject
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </>

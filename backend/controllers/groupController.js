@@ -279,3 +279,80 @@ exports.getGroupByInviteCode = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch group' });
   }
 };
+
+// Request to join a group
+exports.requestJoin = async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.id);
+    if (!group) return res.status(404).json({ message: 'Group not found' });
+
+    const isMember = group.members.some(m => m.userId.toString() === req.user._id.toString());
+    if (isMember) return res.status(400).json({ message: 'Already a member' });
+
+    const alreadyRequested = group.joinRequests.some(
+      r => r.userId.toString() === req.user._id.toString() && r.status === 'pending'
+    );
+    if (alreadyRequested) return res.status(400).json({ message: 'Request already sent' });
+
+    group.joinRequests.push({ userId: req.user._id, status: 'pending' });
+    await group.save();
+
+    res.json({ message: 'Join request sent successfully' });
+  } catch (error) {
+    console.error('Request join error:', error);
+    res.status(500).json({ message: 'Failed to send join request' });
+  }
+};
+
+// Get pending join requests (admin only)
+exports.getJoinRequests = async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.id)
+      .populate('joinRequests.userId', 'name email');
+
+    if (!group) return res.status(404).json({ message: 'Group not found' });
+
+    const isAdmin = group.members.some(
+      m => m.userId.toString() === req.user._id.toString() && m.role === 'admin'
+    );
+    if (!isAdmin) return res.status(403).json({ message: 'Admins only' });
+
+    const pending = group.joinRequests.filter(r => r.status === 'pending');
+    res.json(pending);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch requests' });
+  }
+};
+
+// Accept or reject a join request (admin only)
+exports.handleJoinRequest = async (req, res) => {
+  try {
+    const { requestId, action } = req.body; // action: 'accept' | 'reject'
+    const group = await Group.findById(req.params.id);
+    if (!group) return res.status(404).json({ message: 'Group not found' });
+
+    const isAdmin = group.members.some(
+      m => m.userId.toString() === req.user._id.toString() && m.role === 'admin'
+    );
+    if (!isAdmin) return res.status(403).json({ message: 'Admins only' });
+
+    const request = group.joinRequests.id(requestId);
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+
+    if (action === 'accept') {
+      request.status = 'accepted';
+      group.members.push({ userId: request.userId, role: 'member' });
+    } else {
+      request.status = 'rejected';
+    }
+
+    await group.save();
+    await group.populate('joinRequests.userId', 'name email');
+
+    const pending = group.joinRequests.filter(r => r.status === 'pending');
+    res.json({ message: `Request ${action}ed`, pending });
+  } catch (error) {
+    console.error('Handle request error:', error);
+    res.status(500).json({ message: 'Failed to handle request' });
+  }
+};

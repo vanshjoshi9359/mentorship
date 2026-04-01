@@ -55,14 +55,16 @@ const GroupList = () => {
     }
   };
 
-  const handleJoinGroup = async (groupId) => {
+  const [requestedGroups, setRequestedGroups] = useState(new Set());
+
+  const handleRequestJoin = async (groupId) => {
     if (!user) { navigate('/login'); return; }
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/groups/${groupId}/join`);
-      fetchAllGroups();
-      fetchMyGroups();
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/groups/${groupId}/request-join`);
+      setRequestedGroups(prev => new Set([...prev, groupId]));
+      alert('Join request sent! Waiting for admin approval.');
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to join');
+      alert(error.response?.data?.message || 'Failed to send request');
     }
   };
 
@@ -179,12 +181,16 @@ const GroupList = () => {
                         <Link to={`/groups/${group._id}`} className="btn btn-primary btn-sm">
                           Open Group →
                         </Link>
+                      ) : requestedGroups.has(group._id) ? (
+                        <button className="btn btn-secondary btn-sm" disabled>
+                          ⏳ Pending Approval
+                        </button>
                       ) : (
                         <button
-                          onClick={() => handleJoinGroup(group._id)}
+                          onClick={() => handleRequestJoin(group._id)}
                           className="btn btn-primary btn-sm"
                         >
-                          Join Group
+                          Request to Join
                         </button>
                       )}
                     </div>
