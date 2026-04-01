@@ -43,6 +43,11 @@ const groupSchema = new mongoose.Schema({
   maxMembers: {
     type: Number,
     default: 50
+  },
+  inviteCode: {
+    type: String,
+    unique: true,
+    sparse: true
   }
 }, {
   timestamps: true

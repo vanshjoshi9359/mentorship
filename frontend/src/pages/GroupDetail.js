@@ -18,7 +18,9 @@ const GroupDetail = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showTaskForm, setShowTaskForm] = useState(false);
-  const [messageInput, setMessageInput] = useState('');
+  const [discussionForm, setDiscussionForm] = useState({ whatTried: '', problem: '' });
+  const [showDiscussionForm, setShowDiscussionForm] = useState(false);
+  const [resolutionInputs, setResolutionInputs] = useState({});
   const [taskForm, setTaskForm] = useState({
     title: '',
     description: '',
@@ -76,6 +78,43 @@ const GroupDetail = () => {
     }
   };
 
+  const handleCopyInvite = async () => {
+    try {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/groups/${id}/invite`);
+      const inviteUrl = `${window.location.origin}/join/${res.data.inviteCode}`;
+      await navigator.clipboard.writeText(inviteUrl);
+      alert('Invite link copied to clipboard!');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to generate invite link');
+    }
+  };
+
+  const [showCode, setShowCode] = useState(false);
+  const [inviteCode, setInviteCode] = useState('');
+  const [joinCode, setJoinCode] = useState('');
+
+  const handleShowCode = async () => {
+    try {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/groups/${id}/invite`);
+      setInviteCode(res.data.inviteCode);
+      setShowCode(true);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to generate code');
+    }
+  };
+
+  const handleJoinByCode = async (e) => {
+    e.preventDefault();
+    if (!joinCode.trim()) return;
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/groups/invite/${joinCode.trim()}/join`);
+      alert('Joined successfully!');
+      window.location.reload();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Invalid code');
+    }
+  };
+
   const handleCreateTask = async (e) => {
     e.preventDefault();
     try {
@@ -122,25 +161,36 @@ const GroupDetail = () => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!messageInput.trim()) return;
+    if (!discussionForm.whatTried.trim() || !discussionForm.problem.trim()) return;
 
     try {
       await axios.post(`${process.env.REACT_APP_API_URL}/api/messages`, {
         groupId: id,
-        content: messageInput
+        whatTried: discussionForm.whatTried,
+        problem: discussionForm.problem
       });
-      setMessageInput('');
+      setDiscussionForm({ whatTried: '', problem: '' });
+      setShowDiscussionForm(false);
       fetchGroupData();
-      // Scroll to bottom after sending
-      setTimeout(() => {
-        const messagesContainer = document.querySelector('.messages-container');
-        if (messagesContainer) {
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-      }, 100);
     } catch (error) {
-      console.error('Send message error:', error);
-      alert(error.response?.data?.message || 'Failed to send message');
+      alert(error.response?.data?.message || 'Failed to post discussion');
+    }
+  };
+
+  const handleResolveMessage = async (messageId) => {
+    const resolution = resolutionInputs[messageId];
+    if (!resolution?.trim()) {
+      alert('Please enter a resolution');
+      return;
+    }
+    try {
+      await axios.patch(`${process.env.REACT_APP_API_URL}/api/messages/${messageId}/resolve`, {
+        resolution
+      });
+      setResolutionInputs(prev => ({ ...prev, [messageId]: '' }));
+      fetchGroupData();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to resolve discussion');
     }
   };
 
@@ -174,11 +224,6 @@ const GroupDetail = () => {
         return String(memberId) === String(userId) && member.role === 'admin';
       });
     }
-  }
-  
-  // Temporary fix: treat logged-in users as members
-  if (user && !isMember) {
-    isMember = true;
   }
 
   const getMinDate = () => {
@@ -225,6 +270,11 @@ const GroupDetail = () => {
               Leave Group
             </button>
           )}
+          {isAdmin && (
+            <button onClick={handleShowCode} className="btn btn-secondary">
+              🔑 Group Code
+            </button>
+          )}
         </div>
       </div>
 
@@ -232,16 +282,48 @@ const GroupDetail = () => {
         <div className="join-prompt">
           <div className="join-prompt-content">
             <h2>👋 Join this group to get started!</h2>
-            <p>Once you join, you'll be able to:</p>
-            <ul>
-              <li>📋 View and create tasks</li>
-              <li>📅 Access the calendar view</li>
-              <li>🏆 Compete on the leaderboard</li>
-              <li>👥 Connect with other members</li>
-            </ul>
-            <button onClick={handleJoinGroup} className="btn btn-primary btn-large">
-              Join Group Now
+            <p>Have an invite code? Enter it below to join instantly.</p>
+            <form onSubmit={handleJoinByCode} className="join-code-form">
+              <input
+                type="text"
+                placeholder="Enter group code (e.g. a3f8c2d1)"
+                value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value)}
+                className="join-code-input"
+                maxLength={8}
+              />
+              <button type="submit" className="btn btn-primary">Join with Code</button>
+            </form>
+            <p className="join-divider">— or —</p>
+            <button onClick={handleJoinGroup} className="btn btn-secondary">
+              Join Publicly
             </button>
+          </div>
+        </div>
+      )}
+
+      {showCode && (
+        <div className="task-modal-overlay" onClick={() => setShowCode(false)}>
+          <div className="task-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="task-modal-header">
+              <h3>🔑 Group Invite Code</h3>
+              <button className="modal-close-btn" onClick={() => setShowCode(false)}>✕</button>
+            </div>
+            <div className="task-modal-body">
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                Share this code with people you want to invite. They can enter it on the group page to join.
+              </p>
+              <div className="invite-code-display">
+                {inviteCode}
+              </div>
+              <button
+                className="btn btn-primary"
+                style={{ width: '100%', marginTop: '16px' }}
+                onClick={() => { navigator.clipboard.writeText(inviteCode); alert('Code copied!'); }}
+              >
+                📋 Copy Code
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -285,12 +367,14 @@ const GroupDetail = () => {
             <div className="tasks-section">
               <div className="section-header">
                 <h2>Tasks</h2>
-                <button
-                  onClick={() => setShowTaskForm(!showTaskForm)}
-                  className="btn btn-primary btn-sm"
-                >
-                  {showTaskForm ? 'Cancel' : '+ Add Task'}
-                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => setShowTaskForm(!showTaskForm)}
+                    className="btn btn-primary btn-sm"
+                  >
+                    {showTaskForm ? 'Cancel' : '+ Add Task'}
+                  </button>
+                )}
               </div>
 
               {showTaskForm && (
@@ -515,48 +599,116 @@ const GroupDetail = () => {
 
           {activeTab === 'discussion' && (
             <div className="discussion-section">
-              <h2>💬 Discussion</h2>
-              <div className="messages-container">
-                {!messages || messages.length === 0 ? (
-                  <div className="empty-state">No messages yet. Start the conversation!</div>
-                ) : (
-                  <div className="messages-list">
-                    {messages.map(message => (
-                      <div key={message._id} className={`message-item ${message.userId._id === user._id ? 'own-message' : ''}`}>
-                        <div className="message-header">
-                          <span className="message-author">{message.userId.name}</span>
-                          <span className="message-time">
-                            {new Date(message.createdAt).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="message-content">{message.content}</div>
-                        {message.userId._id === user._id && (
-                          <button
-                            onClick={() => handleDeleteMessage(message._id)}
-                            className="message-delete-btn"
-                            title="Delete message"
-                          >
-                            🗑️
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+              <div className="section-header">
+                <h2>💬 Discussions</h2>
+                {isMember && (
+                  <button
+                    onClick={() => setShowDiscussionForm(!showDiscussionForm)}
+                    className="btn btn-primary btn-sm"
+                  >
+                    {showDiscussionForm ? 'Cancel' : '+ New Discussion'}
+                  </button>
                 )}
               </div>
-              <form onSubmit={handleSendMessage} className="message-form">
-                <input
-                  type="text"
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  placeholder="Type your message..."
-                  className="message-input"
-                  required
-                />
-                <button type="submit" className="btn btn-primary">
-                  Send
-                </button>
-              </form>
+
+              {showDiscussionForm && (
+                <form onSubmit={handleSendMessage} className="discussion-form">
+                  <div className="discussion-form-header">
+                    <span className="form-label-icon">📋</span>
+                    <h3>Post a Discussion</h3>
+                  </div>
+                  <div className="form-group">
+                    <label>What did you try?</label>
+                    <textarea
+                      placeholder="Describe what you have already tried to solve this..."
+                      value={discussionForm.whatTried}
+                      onChange={(e) => setDiscussionForm({ ...discussionForm, whatTried: e.target.value })}
+                      required
+                      rows="3"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>What problem are you facing?</label>
+                    <textarea
+                      placeholder="Describe the problem clearly..."
+                      value={discussionForm.problem}
+                      onChange={(e) => setDiscussionForm({ ...discussionForm, problem: e.target.value })}
+                      required
+                      rows="3"
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary">Post Discussion</button>
+                </form>
+              )}
+
+              <div className="discussions-list">
+                {!messages || messages.length === 0 ? (
+                  <div className="empty-state">No discussions yet. Be the first to post!</div>
+                ) : (
+                  messages.map(msg => (
+                    <div key={msg._id} className={`discussion-card ${msg.isResolved ? 'resolved' : 'open'}`}>
+                      <div className="discussion-card-header">
+                        <div className="discussion-meta">
+                          <span className="discussion-author">{msg.userId?.name}</span>
+                          <span className="discussion-time">{new Date(msg.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <div className="discussion-status">
+                          {msg.isResolved ? (
+                            <span className="status-badge resolved">✅ Resolved</span>
+                          ) : (
+                            <span className="status-badge open">🔓 Open</span>
+                          )}
+                          {user && msg.userId?._id === user._id && !msg.isResolved && (
+                            <button
+                              onClick={() => handleDeleteMessage(msg._id)}
+                              className="btn-icon"
+                              title="Delete"
+                            >🗑️</button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="discussion-body">
+                        <div className="discussion-field">
+                          <span className="field-label">🔧 What I tried:</span>
+                          <p>{msg.whatTried}</p>
+                        </div>
+                        <div className="discussion-field">
+                          <span className="field-label">❓ Problem:</span>
+                          <p>{msg.problem}</p>
+                        </div>
+                      </div>
+
+                      {msg.isResolved && (
+                        <div className="resolution-box">
+                          <span className="field-label">✅ Resolution by {msg.resolvedBy?.name}:</span>
+                          <p>{msg.resolution}</p>
+                          <span className="resolution-date">
+                            Resolved on {new Date(msg.resolvedAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
+
+                      {isAdmin && !msg.isResolved && (
+                        <div className="resolve-form">
+                          <textarea
+                            placeholder="Write your resolution here..."
+                            value={resolutionInputs[msg._id] || ''}
+                            onChange={(e) => setResolutionInputs(prev => ({ ...prev, [msg._id]: e.target.value }))}
+                            rows="2"
+                          />
+                          <button
+                            onClick={() => handleResolveMessage(msg._id)}
+                            className="btn btn-primary btn-sm"
+                          >
+                            Mark as Resolved
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
 

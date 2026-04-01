@@ -59,7 +59,7 @@ const Login = () => {
     <div className="login-page">
       <div className="login-container">
         <h1>Welcome to College Connect</h1>
-        <p className="login-subtitle">A growth-focused knowledge platform</p>
+        <p className="login-subtitle">Collaborate. Schedule. Compete.</p>
         <div className="login-box">
           <h2>{isRegister ? 'Create Account' : 'Sign In'}</h2>
           <p className="login-description">

@@ -1,6 +1,7 @@
 const Group = require('../models/Group');
 const Task = require('../models/Task');
 const User = require('../models/User');
+const crypto = require('crypto');
 
 // Create a new group
 exports.createGroup = async (req, res) => {
@@ -199,5 +200,82 @@ exports.getLeaderboard = async (req, res) => {
   } catch (error) {
     console.error('Get leaderboard error:', error);
     res.status(500).json({ message: 'Failed to fetch leaderboard' });
+  }
+};
+
+// Generate invite link for a group (admin only)
+exports.generateInviteCode = async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.id);
+    if (!group) return res.status(404).json({ message: 'Group not found' });
+
+    const isAdmin = group.members.some(
+      m => m.userId.toString() === req.user._id.toString() && m.role === 'admin'
+    );
+    if (!isAdmin) return res.status(403).json({ message: 'Only admins can generate invite links' });
+
+    // Generate a random 8-char code
+    const inviteCode = crypto.randomBytes(4).toString('hex');
+    group.inviteCode = inviteCode;
+    await group.save();
+
+    res.json({ inviteCode, inviteUrl: `/join/${inviteCode}` });
+  } catch (error) {
+    console.error('Generate invite error:', error);
+    res.status(500).json({ message: 'Failed to generate invite link' });
+  }
+};
+
+// Join group via invite code
+exports.joinByInviteCode = async (req, res) => {
+  try {
+    const { code } = req.params;
+    const group = await Group.findOne({ inviteCode: code })
+      .populate('creatorId', 'name email')
+      .populate('members.userId', 'name email');
+
+    if (!group) return res.status(404).json({ message: 'Invalid or expired invite link' });
+
+    if (group.members.length >= group.maxMembers) {
+      return res.status(400).json({ message: 'Group is full' });
+    }
+
+    const isMember = group.members.some(
+      m => m.userId._id.toString() === req.user._id.toString() ||
+           m.userId.toString() === req.user._id.toString()
+    );
+    if (isMember) return res.status(400).json({ message: 'Already a member', groupId: group._id });
+
+    group.members.push({ userId: req.user._id, role: 'member' });
+    await group.save();
+    await group.populate('members.userId', 'name email');
+
+    res.json({ message: 'Joined successfully', groupId: group._id, group });
+  } catch (error) {
+    console.error('Join by invite error:', error);
+    res.status(500).json({ message: 'Failed to join group' });
+  }
+};
+
+// Get group info by invite code (for preview before joining)
+exports.getGroupByInviteCode = async (req, res) => {
+  try {
+    const { code } = req.params;
+    const group = await Group.findOne({ inviteCode: code })
+      .populate('creatorId', 'name email')
+      .select('name description members maxMembers creatorId inviteCode');
+
+    if (!group) return res.status(404).json({ message: 'Invalid or expired invite link' });
+
+    res.json({
+      _id: group._id,
+      name: group.name,
+      description: group.description,
+      memberCount: group.members.length,
+      maxMembers: group.maxMembers,
+      creatorName: group.creatorId.name
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch group' });
   }
 };

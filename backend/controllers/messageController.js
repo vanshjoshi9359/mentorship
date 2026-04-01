@@ -6,82 +6,93 @@ exports.getGroupMessages = async (req, res) => {
   try {
     const messages = await Message.find({ groupId: req.params.groupId })
       .populate('userId', 'name email')
-      .sort({ createdAt: 1 })
-      .limit(100);
+      .populate('resolvedBy', 'name email')
+      .sort({ createdAt: -1 });
 
     res.json(messages);
   } catch (error) {
     console.error('Get messages error:', error);
-    res.status(500).json({ message: 'Failed to fetch messages' });
+    res.status(500).json({ message: 'Failed to fetch discussions' });
   }
 };
 
-// Create a message
+// Create a discussion (template-based)
 exports.createMessage = async (req, res) => {
   try {
-    const { groupId, content } = req.body;
-
-    console.log('Creating message:', { groupId, content, userId: req.user._id });
+    const { groupId, whatTried, problem } = req.body;
 
     const group = await Group.findById(groupId);
     if (!group) {
-      console.log('Group not found:', groupId);
       return res.status(404).json({ message: 'Group not found' });
-    }
-
-    console.log('Group members:', group.members);
-
-    // Check membership with better logic
-    let isMember = false;
-    for (let member of group.members) {
-      const memberId = member.userId?._id?.toString() || member.userId?.toString();
-      const userId = req.user._id.toString();
-      console.log('Comparing:', memberId, 'with', userId);
-      
-      if (memberId === userId) {
-        isMember = true;
-        break;
-      }
-    }
-
-    console.log('Is member?', isMember);
-
-    if (!isMember) {
-      return res.status(403).json({ message: 'Not a member of this group' });
     }
 
     const message = await Message.create({
       groupId,
       userId: req.user._id,
-      content
+      whatTried,
+      problem
     });
 
     await message.populate('userId', 'name email');
-    console.log('Message created:', message);
     res.status(201).json(message);
   } catch (error) {
-    console.error('Create message error:', error);
-    res.status(500).json({ message: 'Failed to create message', error: error.message });
+    console.error('Create discussion error:', error);
+    res.status(500).json({ message: 'Failed to create discussion' });
   }
 };
 
-// Delete a message
+// Resolve a discussion (admin only)
+exports.resolveMessage = async (req, res) => {
+  try {
+    const { resolution } = req.body;
+    const message = await Message.findById(req.params.id).populate('userId', 'name email');
+
+    if (!message) {
+      return res.status(404).json({ message: 'Discussion not found' });
+    }
+
+    // Check if user is admin of the group
+    const group = await Group.findById(message.groupId);
+    const userId = req.user._id.toString();
+    const isAdmin = group.members.some(
+      m => m.userId.toString() === userId && m.role === 'admin'
+    );
+
+    if (!isAdmin) {
+      return res.status(403).json({ message: 'Only group admins can resolve discussions' });
+    }
+
+    message.isResolved = true;
+    message.resolvedBy = req.user._id;
+    message.resolution = resolution;
+    message.resolvedAt = new Date();
+    await message.save();
+
+    await message.populate('resolvedBy', 'name email');
+    res.json(message);
+  } catch (error) {
+    console.error('Resolve discussion error:', error);
+    res.status(500).json({ message: 'Failed to resolve discussion' });
+  }
+};
+
+// Delete a discussion (own only)
 exports.deleteMessage = async (req, res) => {
   try {
     const message = await Message.findById(req.params.id);
 
     if (!message) {
-      return res.status(404).json({ message: 'Message not found' });
+      return res.status(404).json({ message: 'Discussion not found' });
     }
 
     if (message.userId.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Not authorized to delete this message' });
+      return res.status(403).json({ message: 'Not authorized to delete this discussion' });
     }
 
     await Message.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Message deleted successfully' });
+    res.json({ message: 'Discussion deleted successfully' });
   } catch (error) {
-    console.error('Delete message error:', error);
-    res.status(500).json({ message: 'Failed to delete message' });
+    console.error('Delete discussion error:', error);
+    res.status(500).json({ message: 'Failed to delete discussion' });
   }
 };

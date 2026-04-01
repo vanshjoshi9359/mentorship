@@ -11,12 +11,22 @@ exports.createTask = async (req, res) => {
       return res.status(404).json({ message: 'Group not found' });
     }
 
+    // Check membership - compare as strings to handle ObjectId vs string
+    const userId = req.user._id.toString();
     const isMember = group.members.some(
-      member => member.userId.toString() === req.user._id.toString()
+      member => member.userId.toString() === userId
     );
 
     if (!isMember) {
       return res.status(403).json({ message: 'Not a member of this group' });
+    }
+
+    const isAdmin = group.members.some(
+      member => member.userId.toString() === userId && member.role === 'admin'
+    );
+
+    if (!isAdmin) {
+      return res.status(403).json({ message: 'Only group admins can create tasks' });
     }
 
     const task = await Task.create({

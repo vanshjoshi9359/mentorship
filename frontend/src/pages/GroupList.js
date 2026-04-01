@@ -62,7 +62,7 @@ const GroupList = () => {
   return (
     <div className="group-list-page">
       <div className="hero-section">
-        <h1>Study Groups</h1>
+        <h1>College Connect</h1>
         <p className="hero-subtitle">Join collaborative learning groups, complete tasks, and compete with peers</p>
         {user && (
           <Link to="/create-group" className="btn btn-primary btn-large">

@@ -11,10 +11,34 @@ const messageSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  content: {
+  // Template fields
+  whatTried: {
     type: String,
     required: true,
     trim: true
+  },
+  problem: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  // Resolution by admin/senior
+  isResolved: {
+    type: Boolean,
+    default: false
+  },
+  resolvedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  resolution: {
+    type: String,
+    default: ''
+  },
+  resolvedAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true
