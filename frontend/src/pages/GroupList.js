@@ -16,7 +16,6 @@ const GroupList = () => {
   useEffect(() => {
     fetchAllGroups();
     if (user) fetchMyGroups();
-    else setLoading(false);
   }, [user]);
 
   const fetchAllGroups = async () => {
@@ -24,7 +23,7 @@ const GroupList = () => {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/groups`);
       setAllGroups(res.data);
     } catch (error) {
-      console.error('Fetch all groups error:', error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -35,9 +34,7 @@ const GroupList = () => {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/groups/my-groups`);
       setMyGroups(res.data);
     } catch (error) {
-      console.error('Fetch my groups error:', error);
-    } finally {
-      setLoading(false);
+      console.error(error);
     }
   };
 
@@ -51,162 +48,153 @@ const GroupList = () => {
       navigate(`/groups/${res.data.groupId}`);
     } catch (error) {
       const msg = error.response?.data?.message || 'Invalid code';
-      if (msg === 'Already a member') {
-        navigate(`/groups/${error.response.data.groupId}`);
-      } else {
-        alert(msg);
-      }
+      if (msg === 'Already a member') navigate(`/groups/${error.response.data.groupId}`);
+      else alert(msg);
     } finally {
       setJoining(false);
     }
   };
 
-  return (
-    <div className="group-list-page">
-      <div className="hero-section">
-        <h1>College Connect</h1>
-        <p className="hero-subtitle">Collaborate. Schedule. Compete.</p>
-      </div>
+  const handleJoinGroup = async (groupId) => {
+    if (!user) { navigate('/login'); return; }
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/groups/${groupId}/join`);
+      fetchAllGroups();
+      fetchMyGroups();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to join');
+    }
+  };
 
-      <div className="home-grid">
-        {/* Join by Code */}
-        <div className="home-card join-card">
-          <div className="home-card-icon">🔑</div>
-          <h2>Join a Group</h2>
-          <p>Enter the invite code shared by your mentor or group admin.</p>
-          <form onSubmit={handleJoinByCode} className="join-code-form">
+  const myGroupIds = new Set(myGroups.map(g => g._id));
+
+  return (
+    <div className="feed-layout">
+
+      {/* LEFT SIDEBAR */}
+      <aside className="feed-sidebar">
+        <div className="sidebar-logo">🎓 College Connect</div>
+
+        <nav className="sidebar-nav">
+          {user ? (
+            <Link to="/create-group" className="sidebar-btn sidebar-btn-primary">
+              ➕ Create Group
+            </Link>
+          ) : (
+            <Link to="/login" className="sidebar-btn sidebar-btn-primary">
+              🔑 Login to Create
+            </Link>
+          )}
+        </nav>
+
+        <div className="sidebar-section">
+          <h3>Join by Code</h3>
+          <form onSubmit={handleJoinByCode} className="sidebar-join-form">
             <input
               type="text"
               placeholder="Enter group code"
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value)}
-              className="join-code-input"
+              className="sidebar-input"
               maxLength={8}
             />
-            <button type="submit" className="btn btn-primary" disabled={joining}>
+            <button type="submit" className="sidebar-btn sidebar-btn-secondary" disabled={joining}>
               {joining ? 'Joining...' : 'Join'}
             </button>
           </form>
         </div>
 
-        {/* Create Group */}
-        <div className="home-card create-card">
-          <div className="home-card-icon">➕</div>
-          <h2>Create a Group</h2>
-          <p>Start a new study group, set tasks, and invite your peers.</p>
-          {user ? (
-            <Link to="/create-group" className="btn btn-primary">Create Group</Link>
-          ) : (
-            <Link to="/login" className="btn btn-primary">Login to Create</Link>
-          )}
-        </div>
-      </div>
-
-      {/* My Groups */}
-      <div className="my-groups-section">
-        <h2>My Groups</h2>
-        {!user ? (
-          <div className="empty-state">
-            <p><Link to="/login" style={{ color: 'var(--accent-primary)' }}>Login</Link> to see your groups</p>
-          </div>
-        ) : loading ? (
-          <div className="loading">Loading...</div>
-        ) : myGroups.length === 0 ? (
-          <div className="empty-state">
-            <p>You haven't joined any groups yet. Enter a code or create one above.</p>
-          </div>
-        ) : (
-          <div className="groups-grid">
-            {myGroups.map(group => (
-              <div key={group._id} className="group-card" onClick={() => navigate(`/groups/${group._id}`)}>
-                <div className="group-header">
-                  <h3>{group.name}</h3>
-                </div>
-                <p className="group-description">{group.description}</p>
-                {group.skills && group.skills.length > 0 && (
-                  <div className="skills-tags">
-                    {group.skills.map((skill, idx) => (
-                      <span key={idx} className="skill-tag">{skill}</span>
-                    ))}
-                  </div>
-                )}
-                <div className="group-stats">
-                  <span className="stat">
-                    <span className="stat-icon">👥</span>
-                    {group.members?.length || 0} members
-                  </span>
-                  <span className="stat">
-                    <span className="stat-icon">👤</span>
-                    {group.creatorId?.name || 'Unknown'}
-                  </span>
-                </div>
-                <div className="group-actions">
-                  <Link
-                    to={`/groups/${group._id}`}
-                    className="btn btn-primary"
-                    onClick={e => e.stopPropagation()}
-                  >
-                    Open Group
+        {user && myGroups.length > 0 && (
+          <div className="sidebar-section">
+            <h3>My Groups</h3>
+            <ul className="sidebar-my-groups">
+              {myGroups.map(group => (
+                <li key={group._id}>
+                  <Link to={`/groups/${group._id}`} className="sidebar-group-link">
+                    <span className="sidebar-group-dot" />
+                    {group.name}
                   </Link>
-                </div>
-              </div>
-            ))}
+                </li>
+              ))}
+            </ul>
           </div>
         )}
-      </div>
+      </aside>
 
-      {/* All Groups */}
-      <div className="all-groups-section">
-        <h2>All Groups</h2>
+      {/* MAIN FEED */}
+      <main className="feed-main">
+        <div className="feed-header">
+          <h1>Discover Study Groups</h1>
+          <p>Find groups, learn new skills, and collaborate with peers</p>
+        </div>
+
         {loading ? (
-          <div className="loading">Loading...</div>
+          <div className="loading">Loading groups...</div>
         ) : allGroups.length === 0 ? (
           <div className="empty-state">
-            <p>No groups created yet. Be the first to create one!</p>
+            <p>No groups yet. Be the first to create one!</p>
           </div>
         ) : (
-          <div className="groups-grid">
+          <div className="feed-posts">
             {allGroups.map(group => {
-              const isMember = user && myGroups.some(g => g._id === group._id);
+              const isMember = myGroupIds.has(group._id);
               return (
-                <div key={group._id} className="group-card" onClick={() => navigate(`/groups/${group._id}`)}>
-                  <div className="group-header">
-                    <h3>{group.name}</h3>
-                    {isMember && <span className="member-badge">Member</span>}
+                <article key={group._id} className="feed-post">
+                  <div className="post-top">
+                    <div className="post-avatar">
+                      {group.creatorId?.name?.charAt(0).toUpperCase() || '?'}
+                    </div>
+                    <div className="post-meta">
+                      <span className="post-author">{group.creatorId?.name || 'Unknown'}</span>
+                      <span className="post-time">
+                        {new Date(group.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    </div>
+                    {isMember && <span className="post-member-badge">✓ Member</span>}
                   </div>
-                  <p className="group-description">{group.description}</p>
+
+                  <h2 className="post-title">{group.name}</h2>
+                  <p className="post-description">{group.description}</p>
+
                   {group.skills && group.skills.length > 0 && (
-                    <div className="skills-tags">
-                      {group.skills.map((skill, idx) => (
-                        <span key={idx} className="skill-tag">{skill}</span>
-                      ))}
+                    <div className="post-skills">
+                      <span className="skills-label">🎯 Skills you'll learn:</span>
+                      <div className="skills-tags">
+                        {group.skills.map((skill, idx) => (
+                          <span key={idx} className="skill-tag">{skill}</span>
+                        ))}
+                      </div>
                     </div>
                   )}
-                  <div className="group-stats">
-                    <span className="stat">
-                      <span className="stat-icon">👥</span>
-                      {group.memberCount || group.members?.length || 0} members
-                    </span>
-                    <span className="stat">
-                      <span className="stat-icon">👤</span>
-                      {group.creatorId?.name || 'Unknown'}
-                    </span>
+
+                  <div className="post-footer">
+                    <div className="post-stats">
+                      <span>👥 {group.memberCount || group.members?.length || 0} members</span>
+                    </div>
+                    <div className="post-actions">
+                      <Link to={`/groups/${group._id}`} className="btn btn-secondary btn-sm">
+                        View Details
+                      </Link>
+                      {isMember ? (
+                        <Link to={`/groups/${group._id}`} className="btn btn-primary btn-sm">
+                          Open Group →
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={() => handleJoinGroup(group._id)}
+                          className="btn btn-primary btn-sm"
+                        >
+                          Join Group
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <div className="group-actions">
-                    <Link
-                      to={`/groups/${group._id}`}
-                      className="btn btn-secondary"
-                      onClick={e => e.stopPropagation()}
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
+                </article>
               );
             })}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };
