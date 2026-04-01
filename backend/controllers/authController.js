@@ -100,8 +100,48 @@ const getMe = async (req, res) => {
   });
 };
 
-module.exports = {
-  register,
-  login,
-  getMe
+// @desc    Google OAuth login
+// @route   POST /api/auth/google
+// @access  Public
+const googleAuth = async (req, res) => {
+  try {
+    const { credential } = req.body;
+    const { OAuth2Client } = require('google-auth-library');
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const { name, email, picture, sub: googleId } = ticket.getPayload();
+
+    // Find or create user
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        password: googleId + process.env.JWT_SECRET, // random non-usable password
+        avatar: picture
+      });
+    }
+
+    const token = generateToken(user._id);
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error('Google auth error:', error);
+    res.status(401).json({ message: 'Google authentication failed' });
+  }
 };
+
+module.exports = { register, login, getMe, googleAuth };
