@@ -6,7 +6,7 @@ const crypto = require('crypto');
 // Create a new group
 exports.createGroup = async (req, res) => {
   try {
-    const { name, description, topicId, isPublic, maxMembers } = req.body;
+    const { name, description, topicId, isPublic, maxMembers, skills, price, duration } = req.body;
 
     const group = await Group.create({
       name,
@@ -15,6 +15,9 @@ exports.createGroup = async (req, res) => {
       topicId,
       isPublic: isPublic !== undefined ? isPublic : true,
       maxMembers: maxMembers || 50,
+      skills: skills || [],
+      price: price || 0,
+      duration: duration || '',
       members: [{
         userId: req.user._id,
         role: 'admin'

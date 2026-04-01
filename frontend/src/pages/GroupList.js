@@ -196,7 +196,7 @@ const GroupList = () => {
                       <div>
                         <div className="info-label">Price</div>
                         <div className="info-value">
-                          {group.price === 0 || !group.price ? (
+                          {group.price == null || group.price === 0 ? (
                             <span className="free-badge">FREE</span>
                           ) : (
                             `₹${group.price}`
