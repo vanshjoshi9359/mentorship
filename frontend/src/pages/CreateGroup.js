@@ -8,6 +8,7 @@ const CreateGroup = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    skills: '',
     maxMembers: 50
   });
   const [loading, setLoading] = useState(false);
@@ -26,9 +27,11 @@ const CreateGroup = () => {
     setError(null);
 
     try {
+      const skillsArray = formData.skills.split(',').map(s => s.trim()).filter(Boolean);
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/groups`, {
         name: formData.name,
         description: formData.description,
+        skills: skillsArray,
         maxMembers: parseInt(formData.maxMembers)
       });
       navigate(`/groups/${response.data._id}`);
@@ -72,6 +75,19 @@ const CreateGroup = () => {
               rows="4"
               placeholder="Describe the purpose and goals of this study group..."
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="skills">Skills to Teach</label>
+            <input
+              type="text"
+              id="skills"
+              name="skills"
+              value={formData.skills}
+              onChange={handleChange}
+              placeholder="e.g., Python, Data Structures, Algorithms"
+            />
+            <span className="field-hint">Separate multiple skills with commas</span>
           </div>
 
           <div className="form-group">

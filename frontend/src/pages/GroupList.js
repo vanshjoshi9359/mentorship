@@ -7,15 +7,28 @@ import './GroupList.css';
 const GroupList = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [allGroups, setAllGroups] = useState([]);
   const [myGroups, setMyGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [joinCode, setJoinCode] = useState('');
   const [joining, setJoining] = useState(false);
 
   useEffect(() => {
+    fetchAllGroups();
     if (user) fetchMyGroups();
     else setLoading(false);
   }, [user]);
+
+  const fetchAllGroups = async () => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/groups`);
+      setAllGroups(res.data);
+    } catch (error) {
+      console.error('Fetch all groups error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchMyGroups = async () => {
     try {
@@ -110,6 +123,13 @@ const GroupList = () => {
                   <h3>{group.name}</h3>
                 </div>
                 <p className="group-description">{group.description}</p>
+                {group.skills && group.skills.length > 0 && (
+                  <div className="skills-tags">
+                    {group.skills.map((skill, idx) => (
+                      <span key={idx} className="skill-tag">{skill}</span>
+                    ))}
+                  </div>
+                )}
                 <div className="group-stats">
                   <span className="stat">
                     <span className="stat-icon">👥</span>
@@ -131,6 +151,59 @@ const GroupList = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+      </div>
+
+      {/* All Groups */}
+      <div className="all-groups-section">
+        <h2>All Groups</h2>
+        {loading ? (
+          <div className="loading">Loading...</div>
+        ) : allGroups.length === 0 ? (
+          <div className="empty-state">
+            <p>No groups created yet. Be the first to create one!</p>
+          </div>
+        ) : (
+          <div className="groups-grid">
+            {allGroups.map(group => {
+              const isMember = user && myGroups.some(g => g._id === group._id);
+              return (
+                <div key={group._id} className="group-card" onClick={() => navigate(`/groups/${group._id}`)}>
+                  <div className="group-header">
+                    <h3>{group.name}</h3>
+                    {isMember && <span className="member-badge">Member</span>}
+                  </div>
+                  <p className="group-description">{group.description}</p>
+                  {group.skills && group.skills.length > 0 && (
+                    <div className="skills-tags">
+                      {group.skills.map((skill, idx) => (
+                        <span key={idx} className="skill-tag">{skill}</span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="group-stats">
+                    <span className="stat">
+                      <span className="stat-icon">👥</span>
+                      {group.memberCount || group.members?.length || 0} members
+                    </span>
+                    <span className="stat">
+                      <span className="stat-icon">👤</span>
+                      {group.creatorId?.name || 'Unknown'}
+                    </span>
+                  </div>
+                  <div className="group-actions">
+                    <Link
+                      to={`/groups/${group._id}`}
+                      className="btn btn-secondary"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

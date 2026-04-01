@@ -11,6 +11,10 @@ const groupSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  skills: {
+    type: [String],
+    default: []
+  },
   creatorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

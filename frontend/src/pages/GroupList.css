@@ -250,3 +250,40 @@
   .groups-grid { grid-template-columns: 1fr; }
   .join-code-form { flex-direction: column; }
 }
+
+.skills-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.skill-tag {
+  background: var(--accent-gradient);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.member-badge {
+  background: var(--success);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.all-groups-section {
+  margin-top: 48px;
+}
+
+.all-groups-section h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
