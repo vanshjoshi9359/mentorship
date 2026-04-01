@@ -25,6 +25,7 @@ const app = express();
 // Middleware
 const allowedOrigins = [
   'http://localhost:3000',
+  'https://college-connect-frontend-lp2n.onrender.com',
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
