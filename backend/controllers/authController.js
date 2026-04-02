@@ -65,6 +65,11 @@ const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    // Restrict to NIT Jalandhar only
+    if (!email.endsWith('@nitj.ac.in')) {
+      return res.status(403).json({ message: 'Access restricted to NIT Jalandhar students only.' });
+    }
+
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {

@@ -1,50 +1,26 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { AuthContext } from '../context/AuthContext';
 import './Login.css';
 
 const Login = () => {
-  const { user, login, register, googleLogin } = useContext(AuthContext);
+  const { user, googleLogin } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [isRegister, setIsRegister] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) navigate('/');
   }, [user, navigate]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    const result = isRegister
-      ? await register(formData.name, formData.email, formData.password)
-      : await login(formData.email, formData.password);
-    if (result.success) navigate('/');
-    else setError(result.message);
-    setLoading(false);
-  };
-
   const handleGoogleSuccess = async (credentialResponse) => {
     if (!credentialResponse?.credential) {
-      setError('Google login failed — no credential received');
+      setError('Google login failed — no credential received. Try again.');
       return;
     }
     const result = await googleLogin(credentialResponse.credential);
     if (result.success) navigate('/');
     else setError(result.message);
-  };
-
-  const handleGoogleError = () => {
-    setError('Google login failed. Make sure you use your @nitj.ac.in college email.');
   };
 
   return (
@@ -54,52 +30,25 @@ const Login = () => {
           <div className="login-header">
             <div className="login-logo">🎓</div>
             <h1>Ask a Senior</h1>
-            <p>Real stories. Real advice.</p>
+            <p>Real stories. Real advice. NIT Jalandhar.</p>
           </div>
 
-          {/* Google Login */}
-          <div className="google-login-wrapper">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              theme="filled_black"
-              shape="rectangular"
-              size="large"
-              width="100%"
-              text={isRegister ? 'signup_with' : 'signin_with'}
-            />
-          </div>
+          {error && <div className="error-message">{error}</div>}
 
-          <div className="login-divider"><span>or continue with email</span></div>
-
-          <p className="college-notice">⚠️ Only @nitj.ac.in emails are allowed</p>
-
-          <form onSubmit={handleSubmit} className="login-form">
-            {error && <div className="error-message">{error}</div>}
-            {isRegister && (
-              <div className="form-group">
-                <label>Name</label>
-                <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Your name" />
-              </div>
-            )}
-            <div className="form-group">
-              <label>Email</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="your@email.com" />
+          <div className="google-only-section">
+            <p className="google-only-label">Sign in with your college Google account</p>
+            <div className="google-login-wrapper">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError('Google login failed. Make sure you use your @nitj.ac.in email.')}
+                theme="filled_black"
+                shape="rectangular"
+                size="large"
+                width="360"
+                text="signin_with"
+              />
             </div>
-            <div className="form-group">
-              <label>Password</label>
-              <input type="password" name="password" value={formData.password} onChange={handleChange} required minLength="6" placeholder="At least 6 characters" />
-            </div>
-            <button type="submit" disabled={loading} className="login-button">
-              {loading ? 'Please wait...' : (isRegister ? 'Create Account' : 'Sign In')}
-            </button>
-          </form>
-
-          <div className="login-footer">
-            <p>{isRegister ? 'Already have an account?' : "Don't have an account?"}</p>
-            <button type="button" onClick={() => { setIsRegister(!isRegister); setError(''); }}>
-              {isRegister ? 'Sign In' : 'Create Account'}
-            </button>
+            <p className="college-notice">⚠️ Only @nitj.ac.in emails are allowed</p>
           </div>
         </div>
       </div>
