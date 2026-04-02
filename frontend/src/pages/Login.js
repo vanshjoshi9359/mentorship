@@ -45,8 +45,8 @@ const Login = () => {
         <div className="login-card">
           <div className="login-header">
             <div className="login-logo">🎓</div>
-            <h1>College Connect</h1>
-            <p>Collaborate. Schedule. Compete.</p>
+            <h1>Ask a Senior</h1>
+            <p>Real stories. Real advice.</p>
           </div>
 
           {/* Google Login */}

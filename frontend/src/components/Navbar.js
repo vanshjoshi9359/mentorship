@@ -16,20 +16,19 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          🎓 College Connect
+          🎓 Ask a Senior
         </Link>
         
         <div className="navbar-tagline">
-          Collaborate. Schedule. Compete.
+          Real stories. Real advice.
         </div>
 
         <div className="navbar-menu">
-          <Link to="/groups" className="navbar-link">All Groups</Link>
           {user ? (
             <>
-              <Link to="/create-group" className="navbar-link navbar-create-btn">Create Group</Link>
+              <Link to="/share" className="navbar-link navbar-create-btn">✍️ Share Story</Link>
               <div className="navbar-user">
-                {user.avatar && <img src={user.avatar} alt={user.name} className="navbar-avatar" />}
+                <span className="navbar-avatar">{user.name?.charAt(0).toUpperCase()}</span>
                 <span className="navbar-username">{user.name}</span>
                 <button onClick={handleLogout} className="navbar-logout">Logout</button>
               </div>

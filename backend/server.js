@@ -16,6 +16,7 @@ const searchRoutes = require('./routes/searchRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const storyRoutes = require('./routes/storyRoutes');
 
 // Connect to database
 connectDB();
@@ -56,6 +57,7 @@ app.use('/api/search', searchRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/stories', storyRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

@@ -4,9 +4,9 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
-import GroupList from './pages/GroupList';
-import GroupDetail from './pages/GroupDetail';
-import CreateGroup from './pages/CreateGroup';
+import Feed from './pages/Feed';
+import ShareStory from './pages/ShareStory';
+import StoryDetail from './pages/StoryDetail';
 import PrivateRoute from './components/PrivateRoute';
 import './App.css';
 
@@ -21,11 +21,10 @@ function App() {
               <main className="main-content-full">
                 <Routes>
                   <Route path="/login" element={<Login />} />
-                  <Route path="/" element={<Navigate to="/groups" replace />} />
-                  <Route path="/groups" element={<GroupList />} />
-                  <Route path="/groups/:id" element={<GroupDetail />} />
-                  <Route path="/create-group" element={<PrivateRoute><CreateGroup /></PrivateRoute>} />
-                  <Route path="*" element={<Navigate to="/groups" />} />
+                  <Route path="/" element={<Feed />} />
+                  <Route path="/stories/:id" element={<StoryDetail />} />
+                  <Route path="/share" element={<PrivateRoute><ShareStory /></PrivateRoute>} />
+                  <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </main>
             </div>
