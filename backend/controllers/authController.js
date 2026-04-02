@@ -21,6 +21,11 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Restrict to NIT Jalandhar only
+    if (!email.endsWith('@nitj.ac.in')) {
+      return res.status(403).json({ message: 'Access restricted to NIT Jalandhar students only. Use your @nitj.ac.in email.' });
+    }
+
     // Create user
     const user = await User.create({
       name,
@@ -106,6 +111,11 @@ const getMe = async (req, res) => {
 const googleAuth = async (req, res) => {
   try {
     const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ message: 'No credential provided' });
+    }
+
     const { OAuth2Client } = require('google-auth-library');
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -116,15 +126,28 @@ const googleAuth = async (req, res) => {
 
     const { name, email, picture, sub: googleId } = ticket.getPayload();
 
+    // Restrict to NIT Jalandhar college email only
+    if (!email.endsWith('@nitj.ac.in')) {
+      return res.status(403).json({
+        message: 'Access restricted to NIT Jalandhar students only. Please use your @nitj.ac.in email.'
+      });
+    }
+
     // Find or create user
     let user = await User.findOne({ email });
     if (!user) {
       user = await User.create({
         name,
         email,
-        password: googleId + process.env.JWT_SECRET, // random non-usable password
+        password: googleId + process.env.JWT_SECRET,
         avatar: picture
       });
+    } else {
+      // Update avatar if changed
+      if (picture && user.avatar !== picture) {
+        user.avatar = picture;
+        await user.save();
+      }
     }
 
     const token = generateToken(user._id);
@@ -140,7 +163,7 @@ const googleAuth = async (req, res) => {
     });
   } catch (error) {
     console.error('Google auth error:', error);
-    res.status(401).json({ message: 'Google authentication failed' });
+    res.status(401).json({ message: 'Google authentication failed. Please try again.' });
   }
 };
 

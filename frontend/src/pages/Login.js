@@ -34,9 +34,17 @@ const Login = () => {
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
+    if (!credentialResponse?.credential) {
+      setError('Google login failed — no credential received');
+      return;
+    }
     const result = await googleLogin(credentialResponse.credential);
     if (result.success) navigate('/');
     else setError(result.message);
+  };
+
+  const handleGoogleError = () => {
+    setError('Google login failed. Make sure you use your @nitj.ac.in college email.');
   };
 
   return (
@@ -53,7 +61,7 @@ const Login = () => {
           <div className="google-login-wrapper">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google login failed')}
+              onError={handleGoogleError}
               theme="filled_black"
               shape="rectangular"
               size="large"
@@ -62,7 +70,9 @@ const Login = () => {
             />
           </div>
 
-          <div className="login-divider"><span>or</span></div>
+          <div className="login-divider"><span>or continue with email</span></div>
+
+          <p className="college-notice">⚠️ Only @nitj.ac.in emails are allowed</p>
 
           <form onSubmit={handleSubmit} className="login-form">
             {error && <div className="error-message">{error}</div>}

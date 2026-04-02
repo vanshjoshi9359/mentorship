@@ -220,3 +220,14 @@
   height: 1px;
   background: var(--border-color);
 }
+
+.college-notice {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0;
+}
