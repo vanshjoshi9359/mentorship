@@ -299,3 +299,8 @@
   .feed-sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid #1a1a1a; padding: 16px; }
   .feed-main { padding: 20px 16px; max-width: 100%; }
 }
+
+.year-badge {
+  border-color: #555 !important;
+  color: #ccc !important;
+}

@@ -9,7 +9,8 @@ const ShareStory = () => {
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     company: '', role: '', type: 'placement', package: '',
-    tag: 'on-campus', prepTime: '', resources: '', rounds: '', tips: '', story: ''
+    tag: 'on-campus', prepTime: '', resources: '', rounds: '',
+    tips: '', story: '', graduationYear: ''
   });
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
@@ -73,15 +74,26 @@ const ShareStory = () => {
               <input name="package" value={form.package} onChange={handleChange} placeholder="e.g. 12 LPA, ₹40k/month" />
             </div>
             <div className="form-group">
-              <label>Preparation Time</label>
-              <input name="prepTime" value={form.prepTime} onChange={handleChange} placeholder="e.g. 3 months, 6 weeks" />
+              <label>Graduation Year</label>
+              <select name="graduationYear" value={form.graduationYear} onChange={handleChange}>
+                <option value="">Select year</option>
+                {[2022,2023,2024,2025,2026,2027,2028].map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Interview Rounds</label>
-            <textarea name="rounds" value={form.rounds} onChange={handleChange} rows="3"
-              placeholder="Describe the interview rounds — OA, technical, HR, etc." />
+          <div className="form-row-2">
+            <div className="form-group">
+              <label>Preparation Time</label>
+              <input name="prepTime" value={form.prepTime} onChange={handleChange} placeholder="e.g. 3 months, 6 weeks" />
+            </div>
+            <div className="form-group">
+              <label>Interview Rounds</label>
+              <textarea name="rounds" value={form.rounds} onChange={handleChange} rows="3"
+                placeholder="Describe the interview rounds — OA, technical, HR, etc." />
+            </div>
           </div>
 
           <div className="form-group">

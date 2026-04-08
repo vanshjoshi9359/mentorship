@@ -24,6 +24,7 @@ const storySchema = new mongoose.Schema({
   rounds: { type: String, default: '' },   // description of interview rounds
   tips: { type: String, default: '' },     // advice for juniors
   story: { type: String, required: true }, // main story text
+  graduationYear: { type: Number, default: null }, // e.g. 2024, 2025
   upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   comments: [{
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

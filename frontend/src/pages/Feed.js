@@ -12,7 +12,7 @@ const Feed = () => {
   const navigate = useNavigate();
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ type: '', tag: '', search: '' });
+  const [filters, setFilters] = useState({ type: '', tag: '', search: '', year: '' });
 
   useEffect(() => { fetchStories(); }, [filters]);
 
@@ -22,6 +22,7 @@ const Feed = () => {
       if (filters.type) params.type = filters.type;
       if (filters.tag) params.tag = filters.tag;
       if (filters.search) params.search = filters.search;
+      if (filters.year) params.year = filters.year;
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/stories`, { params });
       setStories(res.data);
     } catch (err) {
@@ -83,6 +84,21 @@ const Feed = () => {
         </div>
 
         <div className="sidebar-section">
+          <h3>Batch Year</h3>
+          <div className="filter-btns">
+            {['', 2022, 2023, 2024, 2025, 2026].map(y => (
+              <button
+                key={y}
+                className={`filter-btn ${filters.year === (y ? String(y) : '') ? 'active' : ''}`}
+                onClick={() => setFilters(f => ({ ...f, year: y ? String(y) : '' }))}
+              >
+                {y === '' ? 'All Years' : `Batch ${y}`}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="sidebar-section">
           <h3>Source</h3>
           <div className="filter-btns">
             {['', 'on-campus', 'off-campus', 'referral', 'other'].map(tag => (
@@ -135,6 +151,11 @@ const Feed = () => {
                       <span className="story-badge" style={{ background: TAG_COLORS[story.tag] }}>
                         {story.tag}
                       </span>
+                      {story.graduationYear && (
+                        <span className="story-badge year-badge">
+                          Batch {story.graduationYear}
+                        </span>
+                      )}
                     </div>
                   </div>
 

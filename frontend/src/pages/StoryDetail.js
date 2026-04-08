@@ -76,6 +76,9 @@ const StoryDetail = () => {
           <div className="story-badges">
             <span className="story-badge" style={{ background: TYPE_COLORS[story.type] }}>{story.type}</span>
             <span className="story-badge" style={{ background: TAG_COLORS[story.tag] }}>{story.tag}</span>
+            {story.graduationYear && (
+              <span className="story-badge year-badge">Batch {story.graduationYear}</span>
+            )}
           </div>
         </div>
 

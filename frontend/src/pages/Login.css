@@ -73,3 +73,11 @@
   margin-bottom: 16px;
   text-align: center;
 }
+
+.loading-msg {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  padding: 8px;
+  animation: pulse 1.5s ease-in-out infinite;
+}

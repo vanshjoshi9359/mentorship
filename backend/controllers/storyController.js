@@ -3,11 +3,12 @@ const Story = require('../models/Story');
 // Get all stories (with filters)
 exports.getStories = async (req, res) => {
   try {
-    const { type, tag, company, search } = req.query;
+    const { type, tag, company, search, year } = req.query;
     const filter = {};
     if (type) filter.type = type;
     if (tag) filter.tag = tag;
     if (company) filter.company = new RegExp(company, 'i');
+    if (year) filter.graduationYear = parseInt(year);
     if (search) {
       filter.$or = [
         { company: new RegExp(search, 'i') },
@@ -43,7 +44,7 @@ exports.getStory = async (req, res) => {
 // Create story
 exports.createStory = async (req, res) => {
   try {
-    const { company, role, type, package: pkg, tag, prepTime, resources, rounds, tips, story } = req.body;
+    const { company, role, type, package: pkg, tag, prepTime, resources, rounds, tips, story, graduationYear } = req.body;
     const newStory = await Story.create({
       author: req.user._id,
       company, role, type,
@@ -53,7 +54,8 @@ exports.createStory = async (req, res) => {
       resources: resources || '',
       rounds: rounds || '',
       tips: tips || '',
-      story
+      story,
+      graduationYear: graduationYear ? parseInt(graduationYear) : null
     });
     await newStory.populate('author', 'name email');
     res.status(201).json(newStory);
