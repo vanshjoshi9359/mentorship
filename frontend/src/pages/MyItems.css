@@ -1,0 +1,79 @@
+.my-items-page { max-width: 1000px; margin: 0 auto; padding: 40px 24px; animation: fadeIn 0.4s ease; }
+
+.my-items-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+.my-items-header h1 { font-size: 32px; font-weight: 800; }
+
+.btn-post {
+  padding: 12px 24px; background: var(--grad); color: white;
+  border: none; border-radius: 12px; font-size: 15px; font-weight: 600;
+  cursor: pointer; text-decoration: none; transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+}
+
+.btn-post:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102,126,234,0.4); }
+
+.my-items-list { display: flex; flex-direction: column; gap: 16px; }
+
+.my-item-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; transition: all 0.2s ease;
+}
+
+.my-item-card:hover { border-color: var(--accent); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.my-item-card.resolved { opacity: 0.7; }
+
+.my-item-left { display: flex; align-items: center; gap: 16px; flex: 1; }
+
+.type-badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid; white-space: nowrap; }
+.type-badge.lost { background: rgba(248,81,73,0.1); color: var(--lost); border-color: rgba(248,81,73,0.3); }
+.type-badge.found { background: rgba(63,185,80,0.1); color: var(--found); border-color: rgba(63,185,80,0.3); }
+
+.my-item-info h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.my-item-info p { font-size: 13px; color: var(--text2); }
+
+.match-badge {
+  display: inline-block; margin-top: 6px; padding: 3px 10px;
+  background: rgba(88,166,255,0.1); color: var(--accent);
+  border: 1px solid rgba(88,166,255,0.2); border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+}
+
+.my-item-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.status-pill { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid; }
+.status-pill.open { background: rgba(88,166,255,0.1); color: var(--accent); border-color: rgba(88,166,255,0.3); }
+.status-pill.resolved { background: rgba(63,185,80,0.1); color: var(--found); border-color: rgba(63,185,80,0.3); }
+
+.btn-view {
+  padding: 8px 16px; background: var(--bg4); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 13px; font-weight: 600;
+  text-decoration: none; transition: all 0.2s ease;
+}
+
+.btn-view:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-resolve-sm {
+  padding: 8px 16px; background: rgba(63,185,80,0.1); color: var(--found);
+  border: 1px solid rgba(63,185,80,0.3); border-radius: 8px; font-size: 13px;
+  font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+}
+
+.btn-resolve-sm:hover { background: rgba(63,185,80,0.2); }
+
+.btn-delete-sm {
+  padding: 8px 16px; background: rgba(248,81,73,0.1); color: var(--lost);
+  border: 1px solid rgba(248,81,73,0.3); border-radius: 8px; font-size: 13px;
+  font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+}
+
+.btn-delete-sm:hover { background: rgba(248,81,73,0.2); }
+
+.empty-state { text-align: center; padding: 80px 32px; color: var(--text2); background: var(--bg2); border-radius: 16px; border: 1px dashed var(--border); }
+.empty-state p { font-size: 18px; margin-bottom: 24px; }
+
+@media (max-width: 768px) {
+  .my-item-card { flex-direction: column; align-items: flex-start; }
+  .my-item-actions { width: 100%; }
+}

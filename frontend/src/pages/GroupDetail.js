@@ -284,7 +284,9 @@ const GroupDetail = () => {
             </button>
           )}
           {user && !isMember && (
-            <span className="not-member-hint">Request to join from the home page</span>
+            <button onClick={handleJoinGroup} className="btn btn-primary">
+              Join Group
+            </button>
           )}
           {isMember && !isAdmin && (
             <button onClick={handleLeaveGroup} className="btn btn-secondary">
@@ -315,6 +317,10 @@ const GroupDetail = () => {
               />
               <button type="submit" className="btn btn-primary">Join with Code</button>
             </form>
+            <p className="join-divider">— or —</p>
+            <button onClick={handleJoinGroup} className="btn btn-secondary">
+              Join Publicly
+            </button>
           </div>
         </div>
       )}

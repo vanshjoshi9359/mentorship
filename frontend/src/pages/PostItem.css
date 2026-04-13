@@ -1,0 +1,83 @@
+.post-item-page { max-width: 800px; margin: 0 auto; padding: 40px 24px; animation: fadeIn 0.4s ease; }
+
+.post-container {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 40px;
+}
+
+.post-container h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+.post-subtitle { color: var(--text2); font-size: 15px; margin-bottom: 32px; }
+
+.type-toggle { display: flex; gap: 12px; margin-bottom: 32px; }
+
+.toggle-btn {
+  flex: 1; padding: 16px; border-radius: 14px; font-size: 16px;
+  font-weight: 600; cursor: pointer; border: 2px solid var(--border);
+  background: var(--bg4); color: var(--text2); transition: all 0.2s ease;
+}
+
+.toggle-btn.active.lost { background: rgba(248,81,73,0.1); color: var(--lost); border-color: var(--lost); }
+.toggle-btn.active.found { background: rgba(63,185,80,0.1); color: var(--found); border-color: var(--found); }
+.toggle-btn:hover { border-color: var(--accent); color: var(--text); }
+
+.post-form { display: flex; flex-direction: column; gap: 20px; }
+
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group label { font-size: 14px; font-weight: 600; color: var(--text); }
+
+.form-group input, .form-group select, .form-group textarea {
+  padding: 14px 16px; background: var(--bg4); border: 1px solid var(--border);
+  border-radius: 12px; color: var(--text); font-size: 15px; font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus, .form-group select, .form-group textarea:focus {
+  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(88,166,255,0.1);
+}
+
+.form-group input::placeholder, .form-group textarea::placeholder { color: var(--text2); }
+.form-group select { cursor: pointer; }
+.form-group select option { background: var(--bg4); }
+.form-group textarea { resize: vertical; min-height: 120px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.error-msg {
+  background: rgba(248,81,73,0.1); color: var(--lost);
+  padding: 14px 16px; border-radius: 12px; font-size: 14px;
+  border: 1px solid rgba(248,81,73,0.3);
+}
+
+.ai-notice {
+  background: rgba(88,166,255,0.08); color: var(--text2);
+  padding: 16px; border-radius: 12px; font-size: 14px;
+  border: 1px solid rgba(88,166,255,0.2); line-height: 1.6;
+}
+
+.ai-notice strong { color: var(--accent); }
+
+.form-actions { display: flex; gap: 12px; margin-top: 8px; }
+
+.btn-cancel {
+  flex: 1; padding: 14px; background: var(--bg4); border: 1px solid var(--border);
+  border-radius: 12px; color: var(--text2); font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s ease;
+}
+
+.btn-cancel:hover { border-color: var(--accent); color: var(--text); }
+
+.btn-submit {
+  flex: 2; padding: 14px; border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+}
+
+.btn-submit.lost { background: linear-gradient(135deg, #f85149, #da3633); color: white; box-shadow: 0 4px 12px rgba(248,81,73,0.3); }
+.btn-submit.found { background: linear-gradient(135deg, #3fb950, #2ea043); color: white; box-shadow: 0 4px 12px rgba(63,185,80,0.3); }
+.btn-submit:hover:not(:disabled) { transform: translateY(-2px); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+  .post-container { padding: 24px; }
+  .form-row { grid-template-columns: 1fr; }
+  .type-toggle { flex-direction: column; }
+}
