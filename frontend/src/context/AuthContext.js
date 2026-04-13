@@ -22,55 +22,13 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/me`);
       setUser(response.data.user);
     } catch (error) {
-      console.error('Fetch user error:', error);
+      // Token is invalid or expired — clear everything silently
       localStorage.removeItem('token');
       delete axios.defaults.headers.common['Authorization'];
+      setUser(null);
     } finally {
       setLoading(false);
     }
-  };
-
-  const register = async (name, email, password) => {
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
-        name,
-        email,
-        password
-      });
-      localStorage.setItem('token', response.data.token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-      setUser(response.data.user);
-      return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Registration failed' 
-      };
-    }
-  };
-
-  const login = async (email, password) => {
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
-        email,
-        password
-      });
-      localStorage.setItem('token', response.data.token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-      setUser(response.data.user);
-      return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Login failed' 
-      };
-    }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
-    setUser(null);
   };
 
   const googleLogin = async (credential) => {
@@ -85,8 +43,31 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
+    setUser(null);
+  };
+
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: '#0f1117',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#8b949e',
+        fontSize: '18px',
+        fontFamily: 'system-ui, sans-serif'
+      }}>
+        🔍 Loading FindIt...
+      </div>
+    );
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, register, login, logout, googleLogin }}>
+    <AuthContext.Provider value={{ user, loading, googleLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );
