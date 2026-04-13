@@ -114,3 +114,46 @@
   .detail-meta-grid { grid-template-columns: 1fr; }
   .owner-actions { flex-direction: column; }
 }
+
+.match-score-row {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.score-bar-wrap {
+  height: 6px;
+  background: var(--bg4);
+  border-radius: 3px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+
+.score-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.shared-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.shared-tags .tag {
+  padding: 2px 8px;
+  background: rgba(88,166,255,0.1);
+  color: var(--accent);
+  border: 1px solid rgba(88,166,255,0.2);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}

@@ -30,16 +30,35 @@ const PostItem = () => {
 
   const handleImageFile = async (file) => {
     if (!file) return;
+
+    // Compress image before uploading
+    const compressImage = (file) => new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 800;
+        let w = img.width, h = img.height;
+        if (w > h && w > MAX) { h = (h * MAX) / w; w = MAX; }
+        else if (h > MAX) { w = (w * MAX) / h; h = MAX; }
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(resolve, 'image/jpeg', 0.75);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+
     // Show preview immediately
     const reader = new FileReader();
     reader.onload = (e) => setImagePreview(e.target.result);
     reader.readAsDataURL(file);
 
-    // Upload to Cloudinary via backend
+    // Compress then upload
     setUploading(true);
     try {
+      const compressed = await compressImage(file);
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('image', compressed, 'image.jpg');
       const res = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/upload`,
         formData,

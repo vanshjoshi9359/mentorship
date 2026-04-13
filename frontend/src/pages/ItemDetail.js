@@ -4,6 +4,61 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import './ItemDetail.css';
 
+const MatchCard = ({ match, currentItemId }) => {
+  const [score, setScore] = useState(null);
+
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_API_URL}/api/items/match-score/${currentItemId}/${match._id}`)
+      .then(res => setScore(res.data))
+      .catch(() => {});
+  }, [currentItemId, match._id]);
+
+  const getScoreColor = (s) => {
+    if (s >= 70) return '#3fb950';
+    if (s >= 50) return '#d29922';
+    return '#8b949e';
+  };
+
+  const getScoreLabel = (s) => {
+    if (s >= 70) return 'Strong Match';
+    if (s >= 50) return 'Possible Match';
+    return 'Weak Match';
+  };
+
+  return (
+    <Link to={`/items/${match._id}`} className="match-card">
+      <div className={`match-type ${match.type}`}>
+        {match.type === 'lost' ? '🔴' : '🟢'}
+      </div>
+      <div className="match-info">
+        <h4>{match.title}</h4>
+        <p>📍 {match.location} · 📅 {new Date(match.date).toLocaleDateString()}</p>
+        {score && (
+          <div className="match-score-row">
+            <div className="score-bar-wrap">
+              <div
+                className="score-bar-fill"
+                style={{ width: `${score.score}%`, background: getScoreColor(score.score) }}
+              />
+            </div>
+            <span className="score-label" style={{ color: getScoreColor(score.score) }}>
+              {score.score}% — {getScoreLabel(score.score)}
+            </span>
+          </div>
+        )}
+        {score?.breakdown?.sharedTags?.length > 0 && (
+          <div className="shared-tags">
+            {score.breakdown.sharedTags.map(t => (
+              <span key={t} className="tag">{t}</span>
+            ))}
+          </div>
+        )}
+      </div>
+      <span className="match-arrow">→</span>
+    </Link>
+  );
+};
+
 const ItemDetail = () => {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
@@ -141,17 +196,7 @@ const ItemDetail = () => {
             ) : (
               <div className="matches-list">
                 {item.matches.map(match => (
-                  <Link to={`/items/${match._id}`} key={match._id} className="match-card">
-                    <div className={`match-type ${match.type}`}>
-                      {match.type === 'lost' ? '🔴' : '🟢'}
-                    </div>
-                    <div className="match-info">
-                      <h4>{match.title}</h4>
-                      <p>📍 {match.location}</p>
-                      <p>📅 {new Date(match.date).toLocaleDateString()}</p>
-                    </div>
-                    <span className="match-arrow">→</span>
-                  </Link>
+                  <MatchCard key={match._id} match={match} currentItemId={item._id} />
                 ))}
               </div>
             )}

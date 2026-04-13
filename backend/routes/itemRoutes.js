@@ -3,13 +3,14 @@ const router = express.Router();
 const { body } = require('express-validator');
 const {
   createItem, getItems, getItem,
-  updateItemStatus, deleteItem, getMyItems, getStats
+  updateItemStatus, deleteItem, getMyItems, getStats, getMatchScore
 } = require('../controllers/itemController');
 const { protect } = require('../middleware/auth');
 const { optionalAuth } = require('../middleware/optionalAuth');
 
 router.get('/stats', getStats);
 router.get('/my-items', protect, getMyItems);
+router.get('/match-score/:id1/:id2', getMatchScore);
 router.get('/', optionalAuth, getItems);
 router.get('/:id', optionalAuth, getItem);
 
