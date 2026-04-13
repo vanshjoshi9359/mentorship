@@ -1,7 +1,6 @@
 services:
-  # Backend Web Service
   - type: web
-    name: college-connect-backend
+    name: studygroups-backend
     runtime: node
     region: oregon
     plan: free
@@ -16,11 +15,16 @@ services:
         sync: false
       - key: JWT_SECRET
         sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: COLLEGE_DOMAIN
+        sync: false
 
-  # Frontend Static Site
   - type: web
-    name: college-connect-frontend
+    name: studygroups-frontend
     runtime: static
+    region: oregon
+    plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/build
     routes:
