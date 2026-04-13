@@ -1,14 +1,14 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthContext } from '../context/AuthContext';
 import './Login.css';
 
+const GOOGLE_CLIENT_ID = '174400663895-obo6oq541202kei3p3ah8dlurvjp8olp.apps.googleusercontent.com';
+
 const Login = () => {
-  const { user, login, register, googleLogin } = useContext(AuthContext);
+  const { user, googleLogin } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [isRegister, setIsRegister] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -16,84 +16,83 @@ const Login = () => {
     if (user) navigate('/');
   }, [user, navigate]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
     setError('');
-    const result = isRegister
-      ? await register(formData.name, formData.email, formData.password)
-      : await login(formData.email, formData.password);
-    if (result.success) navigate('/');
-    else setError(result.message);
+    const result = await googleLogin(credentialResponse.credential);
+    if (result.success) {
+      navigate('/');
+    } else {
+      setError(result.message);
+    }
     setLoading(false);
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    const result = await googleLogin(credentialResponse.credential);
-    if (result.success) navigate('/');
-    else setError(result.message);
+  const handleGoogleError = () => {
+    setError('Google sign-in failed. Please try again.');
   };
 
   return (
-    <div className="login-page">
-      <div className="login-container">
-        <div className="login-card">
-          <div className="login-header">
-            <div className="login-logo">🔍</div>
-            <h1>FindIt</h1>
-            <p>College Lost & Found Portal</p>
-          </div>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <div className="login-page">
+        <div className="login-container">
+          <div className="login-card">
+            <div className="login-header">
+              <div className="login-logo">🔍</div>
+              <h1>FindIt</h1>
+              <p>College Lost & Found Portal</p>
+            </div>
 
-          {/* Google Login */}
-          <div className="google-login-wrapper">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google login failed')}
-              theme="filled_black"
-              shape="rectangular"
-              size="large"
-              width="100%"
-              text={isRegister ? 'signup_with' : 'signin_with'}
-            />
-          </div>
-
-          <div className="login-divider"><span>or</span></div>
-
-          <form onSubmit={handleSubmit} className="login-form">
-            {error && <div className="error-message">{error}</div>}
-            {isRegister && (
-              <div className="form-group">
-                <label>Name</label>
-                <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Your name" />
+            <div className="login-body">
+              <div className="college-notice">
+                <span className="notice-icon">🎓</span>
+                <div>
+                  <strong>College Members Only</strong>
+                  <p>Sign in with your college Google account (@akgec.ac.in)</p>
+                </div>
               </div>
-            )}
-            <div className="form-group">
-              <label>Email</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="your@email.com" />
-            </div>
-            <div className="form-group">
-              <label>Password</label>
-              <input type="password" name="password" value={formData.password} onChange={handleChange} required minLength="6" placeholder="At least 6 characters" />
-            </div>
-            <button type="submit" disabled={loading} className="login-button">
-              {loading ? 'Please wait...' : (isRegister ? 'Create Account' : 'Sign In')}
-            </button>
-          </form>
 
-          <div className="login-footer">
-            <p>{isRegister ? 'Already have an account?' : "Don't have an account?"}</p>
-            <button type="button" onClick={() => { setIsRegister(!isRegister); setError(''); }}>
-              {isRegister ? 'Sign In' : 'Create Account'}
-            </button>
+              {error && (
+                <div className="error-message">
+                  ⚠️ {error}
+                </div>
+              )}
+
+              {loading ? (
+                <div className="login-loading">Signing you in...</div>
+              ) : (
+                <div className="google-btn-wrapper">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    theme="filled_black"
+                    shape="rectangular"
+                    size="large"
+                    text="signin_with"
+                    width="320"
+                  />
+                </div>
+              )}
+
+              <div className="login-features">
+                <div className="feature-item">
+                  <span>📢</span>
+                  <span>Report lost or found items</span>
+                </div>
+                <div className="feature-item">
+                  <span>🤖</span>
+                  <span>AI-powered item matching</span>
+                </div>
+                <div className="feature-item">
+                  <span>🔒</span>
+                  <span>Secure college-only access</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </GoogleOAuthProvider>
   );
 };
 

@@ -100,7 +100,7 @@ const getMe = async (req, res) => {
   });
 };
 
-// @desc    Google OAuth login
+// @desc    Google OAuth login (college email only)
 // @route   POST /api/auth/google
 // @access  Public
 const googleAuth = async (req, res) => {
@@ -116,22 +116,36 @@ const googleAuth = async (req, res) => {
 
     const { name, email, picture, sub: googleId } = ticket.getPayload();
 
+    // Restrict to college email domain
+    const COLLEGE_DOMAIN = process.env.COLLEGE_DOMAIN || 'college.edu';
+    if (!email.endsWith(`@${COLLEGE_DOMAIN}`)) {
+      return res.status(403).json({
+        message: `Only ${COLLEGE_DOMAIN} email addresses are allowed. Please use your college Google account.`
+      });
+    }
+
     // Find or create user
     let user = await User.findOne({ email });
     if (!user) {
       user = await User.create({
         name,
         email,
-        password: googleId + process.env.JWT_SECRET, // random non-usable password
+        password: googleId + process.env.JWT_SECRET,
         avatar: picture
       });
+    } else {
+      // Update avatar if changed
+      if (picture && user.avatar !== picture) {
+        user.avatar = picture;
+        await user.save();
+      }
     }
 
     const token = generateToken(user._id);
     res.json({
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         avatar: user.avatar,
@@ -140,7 +154,7 @@ const googleAuth = async (req, res) => {
     });
   } catch (error) {
     console.error('Google auth error:', error);
-    res.status(401).json({ message: 'Google authentication failed' });
+    res.status(401).json({ message: 'Google authentication failed. Please try again.' });
   }
 };
 
