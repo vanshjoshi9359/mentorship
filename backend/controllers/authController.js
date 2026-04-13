@@ -116,11 +116,11 @@ const googleAuth = async (req, res) => {
 
     const { name, email, picture, sub: googleId } = ticket.getPayload();
 
-    // Restrict to college email domain
-    const COLLEGE_DOMAIN = process.env.COLLEGE_DOMAIN || 'college.edu';
-    if (!email.endsWith(`@${COLLEGE_DOMAIN}`)) {
+    // Restrict to college email domain (optional - set COLLEGE_DOMAIN env var)
+    const COLLEGE_DOMAIN = process.env.COLLEGE_DOMAIN;
+    if (COLLEGE_DOMAIN && !email.endsWith(`@${COLLEGE_DOMAIN}`)) {
       return res.status(403).json({
-        message: `Only ${COLLEGE_DOMAIN} email addresses are allowed. Please use your college Google account.`
+        message: `Only @${COLLEGE_DOMAIN} email addresses are allowed. Please use your college Google account.`
       });
     }
 
