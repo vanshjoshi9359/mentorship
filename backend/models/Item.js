@@ -32,7 +32,8 @@ const itemSchema = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    default: ''
+    default: '',
+    // Stores compressed base64 or URL
   },
   contactInfo: {
     type: String,
