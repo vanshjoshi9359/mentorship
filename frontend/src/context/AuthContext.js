@@ -3,11 +3,24 @@ import axios from 'axios';
 
 export const AuthContext = createContext();
 
+// Bump this version whenever you want to force-clear old tokens
+const APP_VERSION = 'findit-v1';
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // If stored version doesn't match, wipe everything
+    const storedVersion = localStorage.getItem('app_version');
+    if (storedVersion !== APP_VERSION) {
+      localStorage.clear();
+      delete axios.defaults.headers.common['Authorization'];
+      localStorage.setItem('app_version', APP_VERSION);
+      setLoading(false);
+      return;
+    }
+
     const token = localStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
