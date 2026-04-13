@@ -6,6 +6,7 @@ const errorHandler = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/authRoutes');
 const itemRoutes = require('./routes/itemRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 connectDB();
 
@@ -35,6 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/items', itemRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Lost & Found API is running' });

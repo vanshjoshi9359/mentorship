@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './PostItem.css';
@@ -13,22 +13,65 @@ const LOCATIONS = [
 
 const PostItem = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
   const [type, setType] = useState('lost');
   const [form, setForm] = useState({
     title: '', description: '', category: '', location: '',
-    date: new Date().toISOString().split('T')[0], imageUrl: '', contactInfo: ''
+    date: new Date().toISOString().split('T')[0], contactInfo: ''
   });
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  const handleImageFile = async (file) => {
+    if (!file) return;
+    // Show preview immediately
+    const reader = new FileReader();
+    reader.onload = (e) => setImagePreview(e.target.result);
+    reader.readAsDataURL(file);
+
+    // Upload to Cloudinary via backend
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/upload`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+      setImageUrl(res.data.url);
+    } catch (err) {
+      setError('Image upload failed. You can still post without an image.');
+      setImagePreview(null);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileChange = (e) => handleImageFile(e.target.files[0]);
+
+  const removeImage = () => {
+    setImagePreview(null);
+    setImageUrl('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (uploading) return;
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/items`, { ...form, type });
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/items`, {
+        ...form, type, imageUrl
+      });
       navigate(`/items/${res.data._id}`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to post item');
@@ -117,13 +160,52 @@ const PostItem = () => {
           </div>
 
           <div className="form-group">
-            <label>Image URL (optional)</label>
-            <input
-              name="imageUrl"
-              value={form.imageUrl}
-              onChange={handleChange}
-              placeholder="https://... (paste image link)"
-            />
+            <label>Photo (Optional)</label>
+            <div className="image-upload-area">
+              {imagePreview ? (
+                <div className="image-preview">
+                  <img src={imagePreview} alt="Preview" />
+                  {uploading && <div className="upload-overlay">Uploading...</div>}
+                  <button type="button" onClick={removeImage} className="remove-image">✕</button>
+                </div>
+              ) : (
+                <div className="upload-buttons">
+                  {/* Camera - opens camera on mobile */}
+                  <button
+                    type="button"
+                    className="upload-btn camera-btn"
+                    onClick={() => cameraInputRef.current.click()}
+                  >
+                    📷 Take Photo
+                  </button>
+                  {/* Gallery - opens file picker */}
+                  <button
+                    type="button"
+                    className="upload-btn gallery-btn"
+                    onClick={() => fileInputRef.current.click()}
+                  >
+                    🖼️ Choose from Gallery
+                  </button>
+                  {/* Hidden camera input */}
+                  <input
+                    ref={cameraInputRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                  {/* Hidden file input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="form-group">
