@@ -1,11 +1,9 @@
 const DayLog = require('../models/DayLog');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Groq = require('groq-sdk');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const analyseWithGemini = async (rawEntry, date) => {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
+const analyseWithAI = async (rawEntry, date) => {
   const prompt = `You are a personal time coach. Analyse this person's day journal entry and return a JSON response.
 
 Date: ${date}
@@ -28,24 +26,25 @@ Return ONLY valid JSON (no markdown, no code blocks) in this exact format:
 }
 
 Rules:
-- Estimate durations from context clues (if not given)
+- Estimate durations from context clues if not explicitly given
 - Score based on productivity, health, balance (100 = perfect day)
 - Be encouraging but honest
-- Keep suggestions specific and actionable`;
+- Keep suggestions specific and actionable
+- Return ONLY the JSON, nothing else`;
 
-  try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
-    console.log('Gemini raw response:', text.substring(0, 200));
+  const response = await groq.chat.completions.create({
+    messages: [{ role: 'user', content: prompt }],
+    model: 'llama-3.3-70b-versatile',
+    temperature: 0.7,
+    max_tokens: 1500
+  });
 
-    // Strip markdown code blocks if present
-    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    const parsed = JSON.parse(cleaned);
-    return parsed;
-  } catch (err) {
-    console.error('Gemini error details:', err.message);
-    throw err;
-  }
+  const text = response.choices[0].message.content.trim();
+  console.log('AI raw response:', text.substring(0, 200));
+
+  // Strip markdown code blocks if present
+  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  return JSON.parse(cleaned);
 };
 
 // Create or update today's log
@@ -53,16 +52,14 @@ exports.createLog = async (req, res) => {
   try {
     const { rawEntry, date } = req.body;
 
-    // Call Gemini
     let analysis;
     try {
-      analysis = await analyseWithGemini(rawEntry, date);
+      analysis = await analyseWithAI(rawEntry, date);
     } catch (aiError) {
-      console.error('Gemini error:', aiError.message);
+      console.error('AI error:', aiError.message);
       return res.status(500).json({ message: `AI analysis failed: ${aiError.message}` });
     }
 
-    // Upsert (update if same date exists)
     const log = await DayLog.findOneAndUpdate(
       { userId: req.user._id, date },
       {
@@ -90,19 +87,15 @@ exports.createLog = async (req, res) => {
   }
 };
 
-// Get all logs for user
 exports.getLogs = async (req, res) => {
   try {
-    const logs = await DayLog.find({ userId: req.user._id })
-      .sort({ date: -1 })
-      .limit(30);
+    const logs = await DayLog.find({ userId: req.user._id }).sort({ date: -1 }).limit(30);
     res.json(logs);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch logs' });
   }
 };
 
-// Get single log
 exports.getLog = async (req, res) => {
   try {
     const log = await DayLog.findOne({ userId: req.user._id, date: req.params.date });
@@ -113,20 +106,15 @@ exports.getLog = async (req, res) => {
   }
 };
 
-// Get weekly summary
 exports.getWeeklySummary = async (req, res) => {
   try {
-    const logs = await DayLog.find({ userId: req.user._id })
-      .sort({ date: -1 })
-      .limit(7);
-
+    const logs = await DayLog.find({ userId: req.user._id }).sort({ date: -1 }).limit(7);
     if (logs.length === 0) return res.json({ message: 'No data yet' });
 
     const avgScore = Math.round(logs.reduce((s, l) => s + l.score, 0) / logs.length);
     const avgProductiveHours = (logs.reduce((s, l) => s + l.productiveHours, 0) / logs.length).toFixed(1);
     const avgWastedHours = (logs.reduce((s, l) => s + l.wastedHours, 0) / logs.length).toFixed(1);
 
-    // Category totals
     const categoryTotals = {};
     logs.forEach(log => {
       log.activities.forEach(act => {
