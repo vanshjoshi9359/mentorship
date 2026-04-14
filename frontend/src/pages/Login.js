@@ -38,17 +38,17 @@ const Login = () => {
         <div className="login-container">
           <div className="login-card">
             <div className="login-header">
-              <div className="login-logo">🔍</div>
-              <h1>FindIt</h1>
-              <p>College Lost & Found Portal</p>
+              <div className="login-logo">⏱️</div>
+              <h1>TimeFlow</h1>
+              <p>Your AI-powered daily time analyser</p>
             </div>
 
             <div className="login-body">
               <div className="college-notice">
                 <span className="notice-icon">🎓</span>
                 <div>
-                  <strong>College Members Only</strong>
-                  <p>Sign in with your college Google account (@akgec.ac.in)</p>
+                  <strong>Sign in to get started</strong>
+                  <p>Track your time and get AI insights every day</p>
                 </div>
               </div>
 
@@ -75,18 +75,9 @@ const Login = () => {
               )}
 
               <div className="login-features">
-                <div className="feature-item">
-                  <span>📢</span>
-                  <span>Report lost or found items</span>
-                </div>
-                <div className="feature-item">
-                  <span>🤖</span>
-                  <span>AI-powered item matching</span>
-                </div>
-                <div className="feature-item">
-                  <span>🔒</span>
-                  <span>Secure college-only access</span>
-                </div>
+                <div className="feature-item"><span>📝</span><span>Log your daily activities</span></div>
+                <div className="feature-item"><span>🤖</span><span>AI analyses your time patterns</span></div>
+                <div className="feature-item"><span>📊</span><span>Track progress over weeks</span></div>
               </div>
             </div>
           </div>

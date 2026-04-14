@@ -1,0 +1,180 @@
+.log-day-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  animation: fadeIn 0.4s ease;
+}
+
+.log-container {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+}
+
+.log-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.log-header h1 {
+  font-size: 36px;
+  font-weight: 800;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.log-header p {
+  color: var(--text2);
+  font-size: 16px;
+}
+
+.prompt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.prompt-chip {
+  padding: 6px 14px;
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text2);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.prompt-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(88,166,255,0.08);
+}
+
+.log-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.date-row label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text2);
+  white-space: nowrap;
+}
+
+.date-row input {
+  padding: 10px 14px;
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.textarea-wrap {
+  position: relative;
+}
+
+.textarea-wrap textarea {
+  width: 100%;
+  padding: 20px;
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.7;
+  resize: vertical;
+  min-height: 280px;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.textarea-wrap textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(88,166,255,0.1);
+}
+
+.textarea-wrap textarea::placeholder {
+  color: var(--text2);
+  opacity: 0.6;
+}
+
+.char-count {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.error-msg {
+  background: rgba(248,81,73,0.1);
+  color: var(--lost);
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  border: 1px solid rgba(248,81,73,0.3);
+}
+
+.btn-analyse {
+  padding: 18px;
+  background: var(--grad);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(102,126,234,0.4);
+}
+
+.btn-analyse:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(102,126,234,0.5);
+}
+
+.btn-analyse:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.loading-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .log-container { padding: 24px; }
+  .log-header h1 { font-size: 28px; }
+}

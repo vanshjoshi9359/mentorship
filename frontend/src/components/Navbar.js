@@ -7,39 +7,24 @@ const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-  const isActive = (path) => location.pathname === path;
+  const isActive = (p) => location.pathname === p;
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link to="/" className="navbar-logo">
-          🔍 FindIt
-          <span className="navbar-logo-sub">College Lost & Found</span>
-        </Link>
-
-        <div className="navbar-menu">
-          <Link to="/" className={`navbar-link ${isActive('/') ? 'active' : ''}`}>Browse</Link>
-          {user && (
-            <>
-              <Link to="/my-items" className={`navbar-link ${isActive('/my-items') ? 'active' : ''}`}>My Posts</Link>
-              <Link to="/post" className="navbar-post-btn">+ Report Item</Link>
-              <div className="navbar-user">
-                <div className="navbar-avatar">{user.name?.[0]?.toUpperCase()}</div>
-                <span className="navbar-username">{user.name}</span>
-                <button onClick={handleLogout} className="navbar-logout">Logout</button>
-              </div>
-            </>
-          )}
-          {!user && (
-            <Link to="/login" className="navbar-post-btn">Login</Link>
-          )}
-        </div>
+        <Link to="/" className="navbar-logo">⏱️ TimeFlow</Link>
+        {user && (
+          <div className="navbar-menu">
+            <Link to="/" className={`navbar-link ${isActive('/') ? 'active' : ''}`}>Dashboard</Link>
+            <Link to="/log" className={`navbar-link ${isActive('/log') ? 'active' : ''}`}>Log Day</Link>
+            <Link to="/history" className={`navbar-link ${isActive('/history') ? 'active' : ''}`}>History</Link>
+            <div className="navbar-user">
+              <div className="navbar-avatar">{user.name?.[0]?.toUpperCase()}</div>
+              <span className="navbar-username">{user.name?.split(' ')[0]}</span>
+              <button onClick={() => { logout(); navigate('/login'); }} className="navbar-logout">Logout</button>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

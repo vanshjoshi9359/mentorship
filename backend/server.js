@@ -5,43 +5,20 @@ const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/authRoutes');
-const itemRoutes = require('./routes/itemRoutes');
-const uploadRoutes = require('./routes/uploadRoutes');
+const dayLogRoutes = require('./routes/dayLogRoutes');
 
 connectDB();
 
 const app = express();
 
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://college-connect-frontend-lp2n.onrender.com',
-  process.env.FRONTEND_URL,
-].filter(Boolean);
-
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.some(o => origin.startsWith(o.replace(/\/$/, '')))) {
-      callback(null, true);
-    } else {
-      console.log('CORS blocked:', origin);
-      callback(null, true); // allow all in dev
-    }
-  },
-  credentials: true
-}));
-
-app.use(express.json());
+app.use(cors({ origin: '*', credentials: true }));
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
-app.use('/api/items', itemRoutes);
-app.use('/api/upload', uploadRoutes);
+app.use('/api/logs', dayLogRoutes);
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Lost & Found API is running' });
-});
-
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

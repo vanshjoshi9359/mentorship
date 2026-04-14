@@ -3,10 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
-import ItemList from './pages/ItemList';
-import ItemDetail from './pages/ItemDetail';
-import PostItem from './pages/PostItem';
-import MyItems from './pages/MyItems';
+import Dashboard from './pages/Dashboard';
+import LogDay from './pages/LogDay';
+import History from './pages/History';
+import DayDetail from './pages/DayDetail';
 import PrivateRoute from './components/PrivateRoute';
 import './App.css';
 
@@ -19,10 +19,10 @@ function App() {
           <main className="main-content-full">
             <Routes>
               <Route path="/login" element={<Login />} />
-              <Route path="/" element={<ItemList />} />
-              <Route path="/items/:id" element={<ItemDetail />} />
-              <Route path="/post" element={<PrivateRoute><PostItem /></PrivateRoute>} />
-              <Route path="/my-items" element={<PrivateRoute><MyItems /></PrivateRoute>} />
+              <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+              <Route path="/log" element={<PrivateRoute><LogDay /></PrivateRoute>} />
+              <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
+              <Route path="/day/:date" element={<PrivateRoute><DayDetail /></PrivateRoute>} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </main>
