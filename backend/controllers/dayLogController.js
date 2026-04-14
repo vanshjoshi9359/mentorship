@@ -33,12 +33,19 @@ Rules:
 - Be encouraging but honest
 - Keep suggestions specific and actionable`;
 
-  const result = await model.generateContent(prompt);
-  const text = result.response.text().trim();
+  try {
+    const result = await model.generateContent(prompt);
+    const text = result.response.text().trim();
+    console.log('Gemini raw response:', text.substring(0, 200));
 
-  // Strip markdown code blocks if present
-  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  return JSON.parse(cleaned);
+    // Strip markdown code blocks if present
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+    return parsed;
+  } catch (err) {
+    console.error('Gemini error details:', err.message);
+    throw err;
+  }
 };
 
 // Create or update today's log
@@ -51,8 +58,8 @@ exports.createLog = async (req, res) => {
     try {
       analysis = await analyseWithGemini(rawEntry, date);
     } catch (aiError) {
-      console.error('Gemini error:', aiError);
-      return res.status(500).json({ message: 'AI analysis failed. Please try again.' });
+      console.error('Gemini error:', aiError.message);
+      return res.status(500).json({ message: `AI analysis failed: ${aiError.message}` });
     }
 
     // Upsert (update if same date exists)
