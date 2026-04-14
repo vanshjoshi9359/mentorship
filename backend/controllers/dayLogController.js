@@ -4,7 +4,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const analyseWithGemini = async (rawEntry, date) => {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   const prompt = `You are a personal time coach. Analyse this person's day journal entry and return a JSON response.
 
