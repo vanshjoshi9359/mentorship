@@ -1,12 +1,12 @@
 {
   "name": "college-connect",
   "version": "1.0.0",
-  "description": "FindIt - College Lost and Found Portal",
+  "description": "PlaceConnect - Placement Stories Platform",
   "main": "index.js",
   "scripts": {
+    "start": "node backend/server.js",
     "build": "cd frontend && npm install && npm run build",
-    "start": "cd backend && node server.js",
-    "server": "cd backend && node server.js",
+    "server": "node backend/server.js",
     "client": "cd frontend && npm start",
     "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
