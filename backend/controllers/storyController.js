@@ -2,7 +2,11 @@ const Story = require('../models/Story');
 const Groq = require('groq-sdk');
 
 const generateSummary = async (story) => {
-  if (!process.env.GROQ_API_KEY) return '';
+  if (!process.env.GROQ_API_KEY) {
+    console.log('GROQ_API_KEY missing, skipping summary');
+    return '';
+  }
+  console.log('Generating summary for:', story.company);
   try {
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
     const yearContent = story.years.map(y => `Year ${y.year}: ${y.content}`).join('\n\n');
@@ -20,7 +24,9 @@ Return only bullet points starting with •`;
       model: 'llama-3.3-70b-versatile',
       max_tokens: 300
     });
-    return response.choices[0].message.content.trim();
+    const summary = response.choices[0].message.content.trim();
+    console.log('Summary generated:', summary.substring(0, 100));
+    return summary;
   } catch (e) {
     console.error('Summary error:', e.message);
     return '';
