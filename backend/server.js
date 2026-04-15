@@ -9,9 +9,10 @@ console.log('__dirname:', __dirname);
 
 const authRoutes = require('./routes/authRoutes');
 
-let storyRoutes;
+let storyRoutes, recommendRoutes;
 try {
   storyRoutes = require('./routes/storyRoutes');
+  recommendRoutes = require('./routes/recommendRoutes');
   console.log('Routes loaded successfully');
 } catch (e) {
   console.error('Route loading error:', e.message);
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
 if (storyRoutes) app.use('/api/stories', storyRoutes);
+if (recommendRoutes) app.use('/api/recommend', recommendRoutes);
 
 app.get('/', (req, res) => res.json({ message: 'PlaceConnect API', version: '3.0' }));
 app.get('/health', (req, res) => res.json({ status: 'ok', message: 'PlaceConnect API v3' }));
