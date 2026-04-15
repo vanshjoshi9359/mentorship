@@ -1,7 +1,27 @@
 const Story = require('../models/Story');
 const Groq = require('groq-sdk');
 
-const generateSummary = async (story) => {
+// Get company logo URL using Clearbit (free, no API key needed)
+const getCompanyLogo = async (companyName) => {
+  try {
+    // Use Groq to find the company domain
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const response = await groq.chat.completions.create({
+      messages: [{
+        role: 'user',
+        content: `What is the official website domain of "${companyName}"? Reply with ONLY the domain like "google.com" or "tcs.com". No explanation, just the domain.`
+      }],
+      model: 'llama-3.3-70b-versatile',
+      max_tokens: 20
+    });
+    const domain = response.choices[0].message.content.trim().toLowerCase()
+      .replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+    return `https://logo.clearbit.com/${domain}`;
+  } catch (e) {
+    console.error('Logo fetch error:', e.message);
+    return '';
+  }
+};
   if (!process.env.GROQ_API_KEY) {
     console.log('GROQ_API_KEY missing, skipping summary');
     return '';
@@ -45,10 +65,16 @@ exports.createStory = async (req, res) => {
       tags: tags || []
     });
 
-    // Generate AI summary async
-    const summary = await generateSummary(story);
-    story.aiSummary = summary;
-    await story.save();
+    // Generate AI summary and logo in parallel
+    if (process.env.GROQ_API_KEY) {
+      const [summary, logoUrl] = await Promise.all([
+        generateSummary(story),
+        getCompanyLogo(company)
+      ]);
+      story.aiSummary = summary;
+      story.logoUrl = logoUrl;
+      await story.save();
+    }
 
     await story.populate('authorId', 'name email');
     res.status(201).json(story);

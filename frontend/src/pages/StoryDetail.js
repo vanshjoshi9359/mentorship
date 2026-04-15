@@ -45,7 +45,12 @@ const StoryDetail = () => {
 
       <div className="story-header">
         <div className="story-company-row">
-          <div className="company-logo-lg">{story.company[0]}</div>
+          <div className="company-logo-lg">
+            {story.logoUrl ? (
+              <img src={story.logoUrl} alt={story.company} onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
+            ) : null}
+            <span style={{ display: story.logoUrl ? 'none' : 'flex' }}>{story.company[0]}</span>
+          </div>
           <div className="company-info">
             <h1>{story.company}</h1>
             <p>{story.role}</p>

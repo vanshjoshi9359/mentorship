@@ -57,7 +57,12 @@ const Stories = () => {
           {stories.map(story => (
             <Link to={`/stories/${story._id}`} key={story._id} className="story-card">
               <div className="story-top">
-                <div className="company-logo">{story.company[0]}</div>
+                <div className="company-logo">
+                  {story.logoUrl ? (
+                    <img src={story.logoUrl} alt={story.company} onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
+                  ) : null}
+                  <span style={{ display: story.logoUrl ? 'none' : 'flex' }}>{story.company[0]}</span>
+                </div>
                 <div className="story-meta">
                   <div className="story-company">{story.company}</div>
                   <div className="story-role">{story.role}</div>

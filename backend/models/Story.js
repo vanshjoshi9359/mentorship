@@ -15,6 +15,7 @@ const storySchema = new mongoose.Schema({
   years: [yearSchema],
   tips: { type: String, trim: true },
   aiSummary: { type: String, default: '' },
+  logoUrl: { type: String, default: '' },
   upvotes: { type: Number, default: 0 },
   upvotedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   tags: [String]

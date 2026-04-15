@@ -34,10 +34,14 @@
 
 .story-top { display: flex; align-items: flex-start; gap: 14px; }
 .company-logo {
-  width: 52px; height: 52px; border-radius: 12px; background: var(--grad);
+  width: 52px; height: 52px; border-radius: 12px; background: var(--bg4);
   display: flex; align-items: center; justify-content: center;
   font-size: 22px; font-weight: 800; color: white; flex-shrink: 0;
+  overflow: hidden; border: 1px solid var(--border);
 }
+
+.company-logo img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+.company-logo span { background: var(--grad); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 
 .story-meta { flex: 1; }
 .story-company { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
