@@ -1,12 +1,30 @@
 .App { min-height: 100vh; background: var(--bg); display: flex; flex-direction: column; }
-.main-content-full { flex: 1; width: 100%; min-height: calc(100vh - 64px); }
+.main-content-full { flex: 1; width: 100%; min-height: calc(100vh - 70px); }
 
-.btn { padding: 10px 20px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
-.btn-primary { background: var(--grad); color: white; box-shadow: 0 4px 12px rgba(102,126,234,0.3); }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102,126,234,0.4); }
-.btn-secondary { background: var(--bg4); color: var(--text); border: 1px solid var(--border); }
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn {
+  padding: 10px 22px; border: none; border-radius: 12px; font-size: 14px;
+  font-weight: 600; cursor: pointer; transition: all 0.25s ease;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
 
-.empty-state { text-align: center; padding: 60px 20px; color: var(--text2); background: var(--bg2); border-radius: 16px; border: 1px dashed var(--border); }
+.btn-primary {
+  background: var(--grad); color: white;
+  box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+}
+
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.45); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-secondary {
+  background: white; color: var(--text); border: 2px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--text2);
+  background: white; border-radius: 20px; border: 2px dashed var(--border);
+}
+
 .empty-state a { color: var(--accent); text-decoration: none; font-weight: 600; }
