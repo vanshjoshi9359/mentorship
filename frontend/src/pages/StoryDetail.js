@@ -4,6 +4,28 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import './StoryDetail.css';
 
+const CompanyLogo = ({ story }) => {
+  const [src, setSrc] = React.useState(story.logoUrl || '');
+  const [fallbackIndex, setFallbackIndex] = React.useState(0);
+  const letter = story.company?.[0]?.toUpperCase();
+
+  const handleError = () => {
+    if (story.logoUrl && fallbackIndex === 0) {
+      const domain = story.logoUrl.replace('https://logo.clearbit.com/', '');
+      setSrc(`https://www.google.com/s2/favicons?domain=${domain}&sz=128`);
+      setFallbackIndex(1);
+    } else {
+      setSrc('');
+    }
+  };
+
+  return (
+    <div className="company-logo-lg">
+      {src ? <img src={src} alt={story.company} onError={handleError} /> : <span>{letter}</span>}
+    </div>
+  );
+};
+
 const YEAR_LABELS = { 1: '1st Year', 2: '2nd Year', 3: '3rd Year', 4: '4th Year' };
 const YEAR_EMOJIS = { 1: '🌱', 2: '📚', 3: '💻', 4: '🚀' };
 
@@ -45,12 +67,7 @@ const StoryDetail = () => {
 
       <div className="story-header">
         <div className="story-company-row">
-          <div className="company-logo-lg">
-            {story.logoUrl ? (
-              <img src={story.logoUrl} alt={story.company} onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
-            ) : null}
-            <span style={{ display: story.logoUrl ? 'none' : 'flex' }}>{story.company[0]}</span>
-          </div>
+          <CompanyLogo story={story} />
           <div className="company-info">
             <h1>{story.company}</h1>
             <p>{story.role}</p>

@@ -4,6 +4,45 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import './Stories.css';
 
+const CompanyLogo = ({ story, size = 'sm' }) => {
+  const [src, setSrc] = React.useState(story.logoUrl || '');
+  const [fallbackIndex, setFallbackIndex] = React.useState(0);
+  const letter = story.company?.[0]?.toUpperCase();
+
+  const getFallback = (domain) => {
+    const fallbacks = [
+      `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
+      `https://icons.duckduckgo.com/ip3/${domain}.ico`
+    ];
+    return fallbacks[fallbackIndex] || null;
+  };
+
+  const handleError = () => {
+    if (story.logoUrl && fallbackIndex < 2) {
+      const domain = story.logoUrl.replace('https://logo.clearbit.com/', '');
+      const next = getFallback(domain);
+      if (next) {
+        setSrc(next);
+        setFallbackIndex(f => f + 1);
+        return;
+      }
+    }
+    setSrc('');
+  };
+
+  const cls = size === 'lg' ? 'company-logo-lg' : 'company-logo';
+
+  return (
+    <div className={cls}>
+      {src ? (
+        <img src={src} alt={story.company} onError={handleError} />
+      ) : (
+        <span>{letter}</span>
+      )}
+    </div>
+  );
+};
+
 const Stories = () => {
   const { user } = useContext(AuthContext);
   const [stories, setStories] = useState([]);
@@ -57,12 +96,7 @@ const Stories = () => {
           {stories.map(story => (
             <Link to={`/stories/${story._id}`} key={story._id} className="story-card">
               <div className="story-top">
-                <div className="company-logo">
-                  {story.logoUrl ? (
-                    <img src={story.logoUrl} alt={story.company} onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
-                  ) : null}
-                  <span style={{ display: story.logoUrl ? 'none' : 'flex' }}>{story.company[0]}</span>
-                </div>
+                <CompanyLogo story={story} size="sm" />
                 <div className="story-meta">
                   <div className="story-company">{story.company}</div>
                   <div className="story-role">{story.role}</div>

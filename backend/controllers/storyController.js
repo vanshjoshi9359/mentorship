@@ -1,10 +1,11 @@
 const Story = require('../models/Story');
 const Groq = require('groq-sdk');
 
-const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
+const getGroq = () => new Groq({ 
+  apiKey: process.env.GROQ_API_KEY
+});
 
 const getCompanyLogo = async (companyName) => {
-  if (!process.env.GROQ_API_KEY) return '';
   try {
     const groq = getGroq();
     const response = await groq.chat.completions.create({
@@ -14,7 +15,13 @@ const getCompanyLogo = async (companyName) => {
     });
     const domain = response.choices[0].message.content.trim().toLowerCase()
       .replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '').trim();
-    return `https://logo.clearbit.com/${domain}`;
+    // Try multiple logo sources
+    const sources = [
+      `https://logo.clearbit.com/${domain}`,
+      `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
+      `https://icons.duckduckgo.com/ip3/${domain}.ico`
+    ];
+    return sources[0]; // Clearbit first, frontend will fallback
   } catch (e) {
     console.error('Logo error:', e.message);
     return '';
@@ -22,7 +29,6 @@ const getCompanyLogo = async (companyName) => {
 };
 
 const generateSummary = async (story) => {
-  if (!process.env.GROQ_API_KEY) return '';
   try {
     const groq = getGroq();
     const yearContent = story.years.map(y => `Year ${y.year}: ${y.content}`).join('\n\n');
