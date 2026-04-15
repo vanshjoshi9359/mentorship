@@ -31,18 +31,6 @@ const FloatingLogo = ({ company, style }) => {
 
 const Home = () => (
   <div className="home-page">
-    {/* Floating logos background */}
-    <div className="floating-logos-bg">
-      {COMPANIES.map((c, i) => (
-        <FloatingLogo key={c.name} company={c} style={{
-          left: `${(i % 7) * 14 + 2}%`,
-          top: `${Math.floor(i / 7) * 48 + 8}%`,
-          animationDelay: `${i * 0.4}s`,
-          animationDuration: `${3.5 + (i % 4)}s`
-        }} />
-      ))}
-    </div>
-
     {/* Hero */}
     <div className="hero">
       <div className="hero-badge-wrap">
