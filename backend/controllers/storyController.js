@@ -1,39 +1,34 @@
 const Story = require('../models/Story');
 const Groq = require('groq-sdk');
 
-// Get company logo URL using Clearbit (free, no API key needed)
+const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
+
 const getCompanyLogo = async (companyName) => {
+  if (!process.env.GROQ_API_KEY) return '';
   try {
-    // Use Groq to find the company domain
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const groq = getGroq();
     const response = await groq.chat.completions.create({
-      messages: [{
-        role: 'user',
-        content: `What is the official website domain of "${companyName}"? Reply with ONLY the domain like "google.com" or "tcs.com". No explanation, just the domain.`
-      }],
+      messages: [{ role: 'user', content: `What is the official website domain of "${companyName}"? Reply with ONLY the domain like "google.com". No explanation.` }],
       model: 'llama-3.3-70b-versatile',
       max_tokens: 20
     });
     const domain = response.choices[0].message.content.trim().toLowerCase()
-      .replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+      .replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '').trim();
     return `https://logo.clearbit.com/${domain}`;
   } catch (e) {
-    console.error('Logo fetch error:', e.message);
+    console.error('Logo error:', e.message);
     return '';
   }
 };
-  if (!process.env.GROQ_API_KEY) {
-    console.log('GROQ_API_KEY missing, skipping summary');
-    return '';
-  }
-  console.log('Generating summary for:', story.company);
-  try {
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const yearContent = story.years.map(y => `Year ${y.year}: ${y.content}`).join('\n\n');
-    const prompt = `Summarise this placement journey in 3-4 bullet points. Be concise and highlight the most important advice and milestones.
 
-Company: ${story.company}
-Role: ${story.role}
+const generateSummary = async (story) => {
+  if (!process.env.GROQ_API_KEY) return '';
+  try {
+    const groq = getGroq();
+    const yearContent = story.years.map(y => `Year ${y.year}: ${y.content}`).join('\n\n');
+    const prompt = `Summarise this placement journey in 3-4 bullet points. Be concise and highlight the most important advice.
+
+Company: ${story.company}, Role: ${story.role}
 ${yearContent}
 Tips: ${story.tips || 'None'}
 
@@ -44,9 +39,7 @@ Return only bullet points starting with •`;
       model: 'llama-3.3-70b-versatile',
       max_tokens: 300
     });
-    const summary = response.choices[0].message.content.trim();
-    console.log('Summary generated:', summary.substring(0, 100));
-    return summary;
+    return response.choices[0].message.content.trim();
   } catch (e) {
     console.error('Summary error:', e.message);
     return '';
@@ -60,13 +53,11 @@ exports.createStory = async (req, res) => {
     const story = await Story.create({
       authorId: req.user._id,
       company, role, package: pkg, batch, branch,
-      years: years || [],
-      tips: tips || '',
-      tags: tags || []
+      years: years || [], tips: tips || '', tags: tags || []
     });
 
-    // Generate AI summary and logo in parallel
-    if (process.env.GROQ_API_KEY) {
+    // Run AI tasks in parallel, don't fail if they error
+    try {
       const [summary, logoUrl] = await Promise.all([
         generateSummary(story),
         getCompanyLogo(company)
@@ -74,6 +65,8 @@ exports.createStory = async (req, res) => {
       story.aiSummary = summary;
       story.logoUrl = logoUrl;
       await story.save();
+    } catch (aiErr) {
+      console.error('AI tasks error:', aiErr.message);
     }
 
     await story.populate('authorId', 'name email');
@@ -90,13 +83,11 @@ exports.getStories = async (req, res) => {
     const query = {};
     if (company) query.company = new RegExp(company, 'i');
     if (batch) query.batch = batch;
-
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const [stories, total] = await Promise.all([
       Story.find(query).populate('authorId', 'name email').sort({ createdAt: -1 }).skip(skip).limit(parseInt(limit)),
       Story.countDocuments(query)
     ]);
-
     res.json({ stories, total, pages: Math.ceil(total / parseInt(limit)) });
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch stories' });
@@ -117,10 +108,8 @@ exports.upvoteStory = async (req, res) => {
   try {
     const story = await Story.findById(req.params.id);
     if (!story) return res.status(404).json({ message: 'Story not found' });
-
     const userId = req.user._id.toString();
     const alreadyUpvoted = story.upvotedBy.map(id => id.toString()).includes(userId);
-
     if (alreadyUpvoted) {
       story.upvotes -= 1;
       story.upvotedBy = story.upvotedBy.filter(id => id.toString() !== userId);
@@ -128,7 +117,6 @@ exports.upvoteStory = async (req, res) => {
       story.upvotes += 1;
       story.upvotedBy.push(req.user._id);
     }
-
     await story.save();
     res.json({ upvotes: story.upvotes, upvoted: !alreadyUpvoted });
   } catch (error) {
