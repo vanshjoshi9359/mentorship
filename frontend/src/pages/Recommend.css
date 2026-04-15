@@ -92,3 +92,37 @@
   .rec-top { flex-wrap: wrap; }
   .rec-score { flex-direction: row; gap: 8px; align-items: center; }
 }
+
+.tabs-row { display: flex; gap: 8px; margin-bottom: 28px; padding: 6px; background: #f0f4ff; border-radius: 14px; width: fit-content; }
+
+.tab-btn { padding: 10px 24px; background: transparent; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; color: var(--text2); cursor: pointer; transition: all 0.2s ease; }
+.tab-btn.active { background: white; color: #6366f1; box-shadow: 0 2px 8px rgba(99,102,241,0.2); }
+.tab-btn:hover:not(.active) { color: var(--text); }
+
+.profile-card { background: white; border: 2px solid #e0e7ff; border-radius: 24px; padding: 32px; box-shadow: 0 8px 32px rgba(102,126,234,0.1); max-width: 700px; }
+.profile-card h2 { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.profile-subtitle { color: var(--text2); font-size: 15px; margin-bottom: 28px; }
+
+.profile-form { display: flex; flex-direction: column; gap: 18px; }
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+.profile-form .form-group { display: flex; flex-direction: column; gap: 8px; }
+.profile-form .form-group label { font-size: 14px; font-weight: 700; color: var(--text); }
+.profile-form .form-group input, .profile-form .form-group textarea { padding: 12px 16px; background: #f8faff; border: 2px solid #e0e7ff; border-radius: 12px; color: var(--text); font-size: 14px; font-family: inherit; transition: all 0.2s ease; }
+.profile-form .form-group input:focus, .profile-form .form-group textarea:focus { outline: none; border-color: #818cf8; background: white; }
+.profile-form .form-group textarea { resize: vertical; }
+
+.btn-save-profile { padding: 14px 32px; background: var(--grad); color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 6px 20px rgba(102,126,234,0.4); width: fit-content; }
+.btn-save-profile:hover:not(:disabled) { transform: translateY(-2px); }
+.btn-save-profile:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.match-type-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+
+.login-hint { text-align: center; font-size: 13px; color: var(--text2); margin-top: 10px; }
+
+@media (max-width: 640px) {
+  .tabs-row { width: 100%; }
+  .tab-btn { flex: 1; text-align: center; padding: 10px 12px; font-size: 14px; }
+  .profile-card { padding: 20px 16px; }
+  .profile-grid { grid-template-columns: 1fr; }
+}
