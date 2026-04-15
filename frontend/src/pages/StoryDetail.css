@@ -85,3 +85,26 @@
 
 .btn-reply-sm { padding: 10px 16px; background: var(--grad); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .btn-cancel-sm { padding: 10px 16px; background: #f1f5f9; color: var(--text2); border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .story-detail-page { padding: 16px 14px; }
+  .story-header { padding: 20px; border-radius: 18px; }
+  .company-logo-lg { width: 60px; height: 60px; border-radius: 14px; }
+  .company-info h1 { font-size: 22px; }
+  .story-role { font-size: 14px; }
+  .story-actions { flex-wrap: wrap; gap: 8px; }
+  .btn-upvote, .btn-linkedin, .btn-delete-story { padding: 8px 14px; font-size: 13px; }
+  .story-author-info { margin-left: 0; width: 100%; }
+  .year-card { padding: 18px; border-radius: 16px; }
+  .year-card-header h2 { font-size: 18px; }
+  .year-content { font-size: 14px; }
+  .tips-card { padding: 18px; border-radius: 16px; }
+  .tips-card h2 { font-size: 18px; }
+  .tips-content { font-size: 14px; }
+  .comments-section { padding: 18px; border-radius: 18px; }
+  .comments-section h2 { font-size: 18px; }
+  .comment-form { flex-direction: column; }
+  .btn-comment { width: 100%; }
+  .reply-input-row { flex-wrap: wrap; }
+  .reply-input-row input { width: 100%; }
+}

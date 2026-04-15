@@ -78,3 +78,16 @@
   .navbar-username, .navbar-logo-sub { display: none; }
   .navbar-menu { gap: 6px; }
 }
+
+@media (max-width: 640px) {
+  .navbar { padding: 0 12px; }
+  .navbar-container { height: 60px; gap: 8px; }
+  .navbar-logo { font-size: 18px; }
+  .navbar-logo-sub { display: none; }
+  .navbar-menu { gap: 6px; }
+  .navbar-link { padding: 6px 10px; font-size: 13px; }
+  .navbar-post-btn { padding: 8px 14px; font-size: 13px; }
+  .navbar-username { display: none; }
+  .navbar-user { padding: 4px 8px 4px 4px; gap: 6px; }
+  .navbar-logout { padding: 5px 10px; font-size: 12px; }
+}

@@ -28,3 +28,15 @@
 }
 
 .empty-state a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+/* Global mobile fixes */
+@media (max-width: 640px) {
+  .main-content-full { overflow-x: hidden; }
+  
+  input, textarea, select {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+
+  .btn { padding: 10px 18px; font-size: 14px; }
+  .btn-primary, .btn-secondary { border-radius: 10px; }
+}
