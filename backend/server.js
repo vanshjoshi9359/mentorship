@@ -35,7 +35,8 @@ app.get('/health', (req, res) => res.json({ status: 'ok', message: 'PlaceConnect
 app.get('/test', (req, res) => res.json({ test: 'ok', timestamp: new Date().toISOString() }));
 app.get('/env-check', (req, res) => res.json({ 
   hasGroq: !!process.env.GROQ_API_KEY,
-  groqKeyStart: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 10) + '...' : 'NOT SET'
+  groqKeyStart: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 10) + '...' : 'NOT SET',
+  allEnvKeys: Object.keys(process.env).filter(k => !k.includes('PATH') && !k.includes('npm')).join(', ')
 }));
 app.use(errorHandler);
 
