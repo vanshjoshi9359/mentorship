@@ -34,7 +34,7 @@ const register = async (req, res) => {
     res.status(201).json({
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         avatar: user.avatar,
@@ -72,7 +72,7 @@ const login = async (req, res) => {
     res.json({
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         avatar: user.avatar,
@@ -91,7 +91,7 @@ const login = async (req, res) => {
 const getMe = async (req, res) => {
   res.json({
     user: {
-      id: req.user._id,
+      _id: req.user._id,
       name: req.user.name,
       email: req.user.email,
       avatar: req.user.avatar,
