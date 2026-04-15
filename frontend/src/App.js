@@ -3,10 +3,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import LogDay from './pages/LogDay';
-import History from './pages/History';
-import DayDetail from './pages/DayDetail';
+import Home from './pages/Home';
+import Stories from './pages/Stories';
+import StoryDetail from './pages/StoryDetail';
+import PostStory from './pages/PostStory';
+import Doubts from './pages/Doubts';
+import DoubtDetail from './pages/DoubtDetail';
 import PrivateRoute from './components/PrivateRoute';
 import './App.css';
 
@@ -19,10 +21,12 @@ function App() {
           <main className="main-content-full">
             <Routes>
               <Route path="/login" element={<Login />} />
-              <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-              <Route path="/log" element={<PrivateRoute><LogDay /></PrivateRoute>} />
-              <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
-              <Route path="/day/:date" element={<PrivateRoute><DayDetail /></PrivateRoute>} />
+              <Route path="/" element={<Home />} />
+              <Route path="/stories" element={<Stories />} />
+              <Route path="/stories/:id" element={<StoryDetail />} />
+              <Route path="/doubts" element={<Doubts />} />
+              <Route path="/doubts/:id" element={<DoubtDetail />} />
+              <Route path="/post-story" element={<PrivateRoute><PostStory /></PrivateRoute>} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </main>

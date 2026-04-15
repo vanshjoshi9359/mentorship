@@ -38,9 +38,9 @@ const Login = () => {
         <div className="login-container">
           <div className="login-card">
             <div className="login-header">
-              <div className="login-logo">⏱️</div>
-              <h1>TimeFlow</h1>
-              <p>Your AI-powered daily time analyser</p>
+              <div className="login-logo">🎓</div>
+              <h1>PlaceConnect</h1>
+              <p>AKGEC Placement Stories & Doubts</p>
             </div>
 
             <div className="login-body">
@@ -75,9 +75,9 @@ const Login = () => {
               )}
 
               <div className="login-features">
-                <div className="feature-item"><span>📝</span><span>Log your daily activities</span></div>
-                <div className="feature-item"><span>🤖</span><span>AI analyses your time patterns</span></div>
-                <div className="feature-item"><span>📊</span><span>Track progress over weeks</span></div>
+                <div className="feature-item"><span>📖</span><span>Read real placement stories</span></div>
+                <div className="feature-item"><span>🤖</span><span>AI-summarised key takeaways</span></div>
+                <div className="feature-item"><span>❓</span><span>Ask doubts, get answers from seniors</span></div>
               </div>
             </div>
           </div>
