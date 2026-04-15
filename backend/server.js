@@ -33,6 +33,10 @@ if (doubtRoutes) app.use('/api/doubts', doubtRoutes);
 app.get('/', (req, res) => res.json({ message: 'PlaceConnect API', version: '2.0', routes: ['/health', '/api/auth', '/api/stories', '/api/doubts'] }));
 app.get('/health', (req, res) => res.json({ status: 'ok', message: 'PlaceConnect API v2 running', routes: ['/api/auth', '/api/stories', '/api/doubts'] }));
 app.get('/test', (req, res) => res.json({ test: 'ok', timestamp: new Date().toISOString() }));
+app.get('/env-check', (req, res) => res.json({ 
+  hasGroq: !!process.env.GROQ_API_KEY,
+  groqKeyStart: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 10) + '...' : 'NOT SET'
+}));
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
