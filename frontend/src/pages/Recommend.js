@@ -65,7 +65,7 @@ const Recommend = () => {
     <div className="recommend-page">
       <div className="recommend-header">
         <div className="recommend-badge">🤖 AI-Powered Matching</div>
-        <h1>Find Your <span className="highlight">Perfect Match</span></h1>
+        <h1>Find Your <span className="highlight">Growth Partner</span></h1>
         <p>AI matches you with the most relevant people in the community based on your goals, skills, and challenges.</p>
       </div>
 
