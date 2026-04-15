@@ -13,8 +13,8 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          🎓 PlaceConnect
-          <span className="navbar-logo-sub">AKGEC Placement Stories</span>
+          🎓 Connect
+          <span className="navbar-logo-sub">NIT Jalandhar Growth Community</span>
         </Link>
         <div className="navbar-menu">
           <Link to="/stories" className={`navbar-link ${isActive('/stories') ? 'active' : ''}`}>📖 Stories</Link>

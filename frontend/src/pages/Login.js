@@ -39,8 +39,8 @@ const Login = () => {
           <div className="login-card">
             <div className="login-header">
               <div className="login-logo">🎓</div>
-              <h1>PlaceConnect</h1>
-              <p>AKGEC Placement Stories & Doubts</p>
+              <h1>Connect</h1>
+              <p>NIT Jalandhar Growth Community</p>
             </div>
 
             <div className="login-body">

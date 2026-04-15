@@ -48,7 +48,7 @@ const Home = () => (
     </div>
 
     <div className="hero">
-      <div className="hero-badge">🎓 AKGEC Placement Community</div>
+      <div className="hero-badge">🎓 NIT Jalandhar Growth Community</div>
       <h1>Your seniors cracked it.<br /><span className="hero-highlight">Now it's your turn.</span></h1>
       <p>Real placement journeys — year by year, company by company. Learn exactly what it takes.</p>
       <div className="hero-btns">
