@@ -88,3 +88,32 @@
   .story-badges { gap: 6px; }
   .badge { font-size: 11px; padding: 3px 8px; }
 }
+
+.story-company-row-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.li-btn-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: #0077b5;
+  color: white;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  font-family: Georgia, serif;
+}
+
+.li-btn-inline:hover {
+  background: #005885;
+  transform: scale(1.1);
+}

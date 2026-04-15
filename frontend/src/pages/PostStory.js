@@ -78,8 +78,8 @@ const PostStory = () => {
                 <input name="branch" value={form.branch} onChange={handleChange} placeholder="e.g. CSE, IT, ECE" />
               </div>
               <div className="form-group">
-                <label>🔗 LinkedIn Profile</label>
-                <input name="linkedIn" value={form.linkedIn} onChange={handleChange} placeholder="https://linkedin.com/in/yourprofile" />
+                <label>🔗 LinkedIn Profile *</label>
+                <input name="linkedIn" value={form.linkedIn} onChange={handleChange} required placeholder="https://linkedin.com/in/yourprofile" />
               </div>
             </div>
           </div>

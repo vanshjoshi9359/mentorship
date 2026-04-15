@@ -98,7 +98,21 @@ const Stories = () => {
               <div className="story-top">
                 <CompanyLogo story={story} size="sm" />
                 <div className="story-meta">
-                  <div className="story-company">{story.company}</div>
+                  <div className="story-company-row-inner">
+                    <div className="story-company">{story.company}</div>
+                    {story.linkedIn && (
+                      <a
+                        href={story.linkedIn}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="li-btn-inline"
+                        onClick={e => e.stopPropagation()}
+                        title="Connect on LinkedIn"
+                      >
+                        in
+                      </a>
+                    )}
+                  </div>
                   <div className="story-role">{story.role}</div>
                   <div className="story-badges">
                     {story.package && <span className="badge badge-pkg">💰 {story.package}</span>}
