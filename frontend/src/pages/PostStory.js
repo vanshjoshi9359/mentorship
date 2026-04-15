@@ -11,10 +11,12 @@ const YEAR_PROMPTS = {
 };
 
 const YEAR_LABELS = { 1: '1st Year', 2: '2nd Year', 3: '3rd Year', 4: '4th Year' };
+const YEAR_COLORS = { 1: '#ede9fe', 2: '#dbeafe', 3: '#d1fae5', 4: '#fce7f3' };
+const YEAR_ACCENT = { 1: '#7c3aed', 2: '#2563eb', 3: '#059669', 4: '#db2777' };
 
 const PostStory = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ company: '', role: '', package: '', batch: '', branch: '', tips: '' });
+  const [form, setForm] = useState({ company: '', role: '', package: '', batch: '', branch: '', linkedIn: '', tips: '' });
   const [years, setYears] = useState({ 1: '', 2: '', 3: '', 4: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,7 +31,6 @@ const PostStory = () => {
     e.preventDefault();
     const filledYears = Object.entries(years).filter(([, v]) => v.trim()).map(([y, content]) => ({ year: parseInt(y), content }));
     if (filledYears.length === 0) { setError('Please fill at least one year section.'); return; }
-
     setLoading(true);
     setError('');
     try {
@@ -45,49 +46,58 @@ const PostStory = () => {
   return (
     <div className="post-story-page">
       <div className="post-container">
-        <h1>Share Your Placement Story</h1>
-        <p className="post-subtitle">Help juniors by sharing your journey. AI will generate a summary automatically.</p>
+        <div className="post-header">
+          <h1>🚀 Share Your Placement Story</h1>
+          <p className="post-subtitle">Inspire juniors by sharing your real journey. Your story matters!</p>
+        </div>
 
         <form onSubmit={handleSubmit}>
           {error && <div className="error-msg">⚠️ {error}</div>}
 
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Company *</label>
-              <input name="company" value={form.company} onChange={handleChange} required placeholder="e.g. Google, TCS, Infosys" />
-            </div>
-            <div className="form-group">
-              <label>Role *</label>
-              <input name="role" value={form.role} onChange={handleChange} required placeholder="e.g. Software Engineer" />
-            </div>
-            <div className="form-group">
-              <label>Package (CTC)</label>
-              <input name="package" value={form.package} onChange={handleChange} placeholder="e.g. 12 LPA" />
-            </div>
-            <div className="form-group">
-              <label>Batch *</label>
-              <input name="batch" value={form.batch} onChange={handleChange} required placeholder="e.g. 2024" />
-            </div>
-            <div className="form-group">
-              <label>Branch</label>
-              <input name="branch" value={form.branch} onChange={handleChange} placeholder="e.g. CSE, IT, ECE" />
+          <div className="form-section">
+            <h3 className="form-section-title">🏢 Company Details</h3>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Company *</label>
+                <input name="company" value={form.company} onChange={handleChange} required placeholder="e.g. Google, TCS, Infosys" />
+              </div>
+              <div className="form-group">
+                <label>Role *</label>
+                <input name="role" value={form.role} onChange={handleChange} required placeholder="e.g. Software Engineer" />
+              </div>
+              <div className="form-group">
+                <label>Package (CTC)</label>
+                <input name="package" value={form.package} onChange={handleChange} placeholder="e.g. 12 LPA" />
+              </div>
+              <div className="form-group">
+                <label>Batch *</label>
+                <input name="batch" value={form.batch} onChange={handleChange} required placeholder="e.g. 2024" />
+              </div>
+              <div className="form-group">
+                <label>Branch</label>
+                <input name="branch" value={form.branch} onChange={handleChange} placeholder="e.g. CSE, IT, ECE" />
+              </div>
+              <div className="form-group">
+                <label>🔗 LinkedIn Profile</label>
+                <input name="linkedIn" value={form.linkedIn} onChange={handleChange} placeholder="https://linkedin.com/in/yourprofile" />
+              </div>
             </div>
           </div>
 
           <div className="year-section">
-            <h2>📅 Year-wise Journey</h2>
+            <h3 className="form-section-title">📅 Year-wise Journey</h3>
             {[1, 2, 3, 4].map(year => (
-              <div key={year} className="year-block">
-                <h3>{YEAR_LABELS[year]}</h3>
+              <div key={year} className="year-block" style={{ background: YEAR_COLORS[year], borderColor: YEAR_ACCENT[year] + '40' }}>
+                <h3 style={{ color: YEAR_ACCENT[year] }}>{YEAR_LABELS[year]}</h3>
                 <div className="year-prompts">
                   {YEAR_PROMPTS[year].map(p => (
-                    <button key={p} type="button" className="year-prompt" onClick={() => addPrompt(year, p)}>+ {p}</button>
+                    <button key={p} type="button" className="year-prompt" style={{ borderColor: YEAR_ACCENT[year] + '60', color: YEAR_ACCENT[year] }} onClick={() => addPrompt(year, p)}>+ {p}</button>
                   ))}
                 </div>
                 <textarea
                   value={years[year]}
                   onChange={e => setYears(prev => ({ ...prev, [year]: e.target.value }))}
-                  placeholder={`What did you do in your ${YEAR_LABELS[year]}? What worked, what didn't?`}
+                  placeholder={`What did you do in your ${YEAR_LABELS[year]}?`}
                   rows="5"
                 />
               </div>
@@ -99,14 +109,10 @@ const PostStory = () => {
             <textarea name="tips" value={form.tips} onChange={handleChange} placeholder="What advice would you give to juniors starting their placement journey?" rows="4" />
           </div>
 
-          <div className="ai-notice">
-            🤖 <strong>AI Summary:</strong> After posting, Groq AI will automatically generate key takeaways from your story to help juniors quickly understand your journey.
-          </div>
-
           <div className="form-actions">
             <button type="button" className="btn-cancel" onClick={() => navigate('/stories')}>Cancel</button>
             <button type="submit" disabled={loading} className="btn-submit">
-              {loading ? '⏳ Posting & Generating AI Summary...' : '🚀 Share My Story'}
+              {loading ? '⏳ Posting...' : '🚀 Share My Story'}
             </button>
           </div>
         </form>

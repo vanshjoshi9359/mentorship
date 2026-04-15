@@ -6,14 +6,12 @@ const errorHandler = require('./middleware/errorHandler');
 
 console.log('=== SERVER STARTING ===');
 console.log('__dirname:', __dirname);
-console.log('Node version:', process.version);
 
 const authRoutes = require('./routes/authRoutes');
 
-let storyRoutes, doubtRoutes;
+let storyRoutes;
 try {
   storyRoutes = require('./routes/storyRoutes');
-  doubtRoutes = require('./routes/doubtRoutes');
   console.log('Routes loaded successfully');
 } catch (e) {
   console.error('Route loading error:', e.message);
@@ -28,16 +26,12 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
 if (storyRoutes) app.use('/api/stories', storyRoutes);
-if (doubtRoutes) app.use('/api/doubts', doubtRoutes);
 
-app.get('/', (req, res) => res.json({ message: 'PlaceConnect API', version: '2.0', routes: ['/health', '/api/auth', '/api/stories', '/api/doubts'] }));
-app.get('/health', (req, res) => res.json({ status: 'ok', message: 'PlaceConnect API v2 running', routes: ['/api/auth', '/api/stories', '/api/doubts'] }));
+app.get('/', (req, res) => res.json({ message: 'PlaceConnect API', version: '3.0' }));
+app.get('/health', (req, res) => res.json({ status: 'ok', message: 'PlaceConnect API v3' }));
 app.get('/test', (req, res) => res.json({ test: 'ok', timestamp: new Date().toISOString() }));
-app.get('/env-check', (req, res) => res.json({ 
-  hasGroq: !!process.env.GROQ_API_KEY,
-  groqKeyStart: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 10) + '...' : 'NOT SET',
-  allEnvKeys: Object.keys(process.env).filter(k => !k.includes('PATH') && !k.includes('npm')).join(', ')
-}));
+app.get('/env-check', (req, res) => res.json({ hasGroq: !!process.env.GROQ_API_KEY }));
+
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

@@ -1,11 +1,10 @@
 const Story = require('../models/Story');
 const Groq = require('groq-sdk');
 
-const getGroq = () => new Groq({ 
-  apiKey: process.env.GROQ_API_KEY
-});
+const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const getCompanyLogo = async (companyName) => {
+  if (!process.env.GROQ_API_KEY) return '';
   try {
     const groq = getGroq();
     const response = await groq.chat.completions.create({
@@ -15,65 +14,30 @@ const getCompanyLogo = async (companyName) => {
     });
     const domain = response.choices[0].message.content.trim().toLowerCase()
       .replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '').trim();
-    // Try multiple logo sources
-    const sources = [
-      `https://logo.clearbit.com/${domain}`,
-      `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
-      `https://icons.duckduckgo.com/ip3/${domain}.ico`
-    ];
-    return sources[0]; // Clearbit first, frontend will fallback
+    return `https://logo.clearbit.com/${domain}`;
   } catch (e) {
     console.error('Logo error:', e.message);
     return '';
   }
 };
 
-const generateSummary = async (story) => {
-  try {
-    const groq = getGroq();
-    const yearContent = story.years.map(y => `Year ${y.year}: ${y.content}`).join('\n\n');
-    const prompt = `Summarise this placement journey in 3-4 bullet points. Be concise and highlight the most important advice.
-
-Company: ${story.company}, Role: ${story.role}
-${yearContent}
-Tips: ${story.tips || 'None'}
-
-Return only bullet points starting with •`;
-
-    const response = await groq.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
-      model: 'llama-3.3-70b-versatile',
-      max_tokens: 300
-    });
-    return response.choices[0].message.content.trim();
-  } catch (e) {
-    console.error('Summary error:', e.message);
-    return '';
-  }
-};
-
 exports.createStory = async (req, res) => {
   try {
-    const { company, role, package: pkg, batch, branch, years, tips, tags } = req.body;
+    const { company, role, package: pkg, batch, branch, linkedIn, years, tips, tags } = req.body;
 
     const story = await Story.create({
       authorId: req.user._id,
       company, role, package: pkg, batch, branch,
+      linkedIn: linkedIn || '',
       years: years || [], tips: tips || '', tags: tags || []
     });
 
-    // Run AI tasks in parallel, don't fail if they error
+    // Fetch logo in background
     try {
-      const [summary, logoUrl] = await Promise.all([
-        generateSummary(story),
-        getCompanyLogo(company)
-      ]);
-      story.aiSummary = summary;
+      const logoUrl = await getCompanyLogo(company);
       story.logoUrl = logoUrl;
       await story.save();
-    } catch (aiErr) {
-      console.error('AI tasks error:', aiErr.message);
-    }
+    } catch (e) { console.error('Logo fetch failed:', e.message); }
 
     await story.populate('authorId', 'name email');
     res.status(201).json(story);
@@ -102,7 +66,10 @@ exports.getStories = async (req, res) => {
 
 exports.getStory = async (req, res) => {
   try {
-    const story = await Story.findById(req.params.id).populate('authorId', 'name email');
+    const story = await Story.findById(req.params.id)
+      .populate('authorId', 'name email')
+      .populate('comments.authorId', 'name email')
+      .populate('comments.replies.authorId', 'name email');
     if (!story) return res.status(404).json({ message: 'Story not found' });
     res.json(story);
   } catch (error) {
@@ -127,6 +94,45 @@ exports.upvoteStory = async (req, res) => {
     res.json({ upvotes: story.upvotes, upvoted: !alreadyUpvoted });
   } catch (error) {
     res.status(500).json({ message: 'Failed to upvote' });
+  }
+};
+
+// Add comment (anyone logged in)
+exports.addComment = async (req, res) => {
+  try {
+    const story = await Story.findById(req.params.id);
+    if (!story) return res.status(404).json({ message: 'Story not found' });
+    story.comments.push({ authorId: req.user._id, content: req.body.content });
+    await story.save();
+    await story.populate('authorId', 'name email');
+    await story.populate('comments.authorId', 'name email');
+    res.json(story);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to add comment' });
+  }
+};
+
+// Reply to comment (only story poster)
+exports.replyComment = async (req, res) => {
+  try {
+    const story = await Story.findById(req.params.id);
+    if (!story) return res.status(404).json({ message: 'Story not found' });
+
+    if (story.authorId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Only the story author can reply to comments' });
+    }
+
+    const comment = story.comments.id(req.params.commentId);
+    if (!comment) return res.status(404).json({ message: 'Comment not found' });
+
+    comment.replies.push({ authorId: req.user._id, content: req.body.content });
+    await story.save();
+    await story.populate('authorId', 'name email');
+    await story.populate('comments.authorId', 'name email');
+    await story.populate('comments.replies.authorId', 'name email');
+    res.json(story);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to reply' });
   }
 };
 

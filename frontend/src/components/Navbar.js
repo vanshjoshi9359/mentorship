@@ -18,7 +18,6 @@ const Navbar = () => {
         </Link>
         <div className="navbar-menu">
           <Link to="/stories" className={`navbar-link ${isActive('/stories') ? 'active' : ''}`}>📖 Stories</Link>
-          <Link to="/doubts" className={`navbar-link ${isActive('/doubts') ? 'active' : ''}`}>❓ Doubts</Link>
           {user ? (
             <>
               <Link to="/post-story" className="navbar-post-btn">+ Share Story</Link>

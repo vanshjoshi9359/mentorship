@@ -7,8 +7,6 @@ import Home from './pages/Home';
 import Stories from './pages/Stories';
 import StoryDetail from './pages/StoryDetail';
 import PostStory from './pages/PostStory';
-import Doubts from './pages/Doubts';
-import DoubtDetail from './pages/DoubtDetail';
 import PrivateRoute from './components/PrivateRoute';
 import './App.css';
 
@@ -24,8 +22,6 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/stories" element={<Stories />} />
               <Route path="/stories/:id" element={<StoryDetail />} />
-              <Route path="/doubts" element={<Doubts />} />
-              <Route path="/doubts/:id" element={<DoubtDetail />} />
               <Route path="/post-story" element={<PrivateRoute><PostStory /></PrivateRoute>} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
