@@ -15,6 +15,8 @@ const COMPANIES = [
   { name: 'Adobe', domain: 'adobe.com' },
   { name: 'Oracle', domain: 'oracle.com' },
   { name: 'IBM', domain: 'ibm.com' },
+  { name: 'Atlassian', domain: 'atlassian.com' },
+  { name: 'Paytm', domain: 'paytm.com' },
 ];
 
 const FloatingLogo = ({ company, style }) => {
@@ -27,59 +29,46 @@ const FloatingLogo = ({ company, style }) => {
   );
 };
 
-const STATS = [
-  { num: '200+', label: 'Stories Shared', icon: '📖', color: 'var(--grad)' },
-  { num: '50+', label: 'Companies', icon: '🏢', color: 'var(--grad-warm)' },
-  { num: '100%', label: 'Real Experiences', icon: '✅', color: 'var(--grad-green)' },
-  { num: 'AI', label: 'Logo Detection', icon: '🤖', color: 'var(--grad-cool)' },
-];
-
 const Home = () => (
   <div className="home-page">
+    {/* Floating logos background */}
     <div className="floating-logos-bg">
       {COMPANIES.map((c, i) => (
         <FloatingLogo key={c.name} company={c} style={{
-          left: `${(i % 6) * 17 + 2}%`,
-          top: `${Math.floor(i / 6) * 50 + 5}%`,
-          animationDelay: `${i * 0.5}s`,
-          animationDuration: `${3.5 + (i % 3)}s`
+          left: `${(i % 7) * 14 + 2}%`,
+          top: `${Math.floor(i / 7) * 48 + 8}%`,
+          animationDelay: `${i * 0.4}s`,
+          animationDuration: `${3.5 + (i % 4)}s`
         }} />
       ))}
     </div>
 
+    {/* Hero */}
     <div className="hero">
-      <div className="hero-badge">🎓 NIT Jalandhar Growth Community</div>
-      <div className="hero-btns">
-        <Link to="/stories" className="btn-hero-primary">📖 Explore Stories</Link>
-        <Link to="/post-story" className="btn-hero-secondary">✍️ Share Your Story</Link>
+      <div className="hero-badge-wrap">
+        <span className="hero-badge-dot" />
+        <span>NIT Jalandhar Growth Community</span>
       </div>
-    </div>
 
-    <div className="stats-row">
-      {STATS.map(s => (
-        <div key={s.label} className="stat-card" style={{ background: s.color }}>
-          <div className="stat-icon">{s.icon}</div>
-          <div className="stat-num">{s.num}</div>
-          <div className="stat-label">{s.label}</div>
+      <div className="hero-cta">
+        <Link to="/stories" className="btn-hero-primary">📖 Explore Stories</Link>
+        <Link to="/recommend" className="btn-hero-secondary">🤖 Find Growth Partner</Link>
+      </div>
+
+      {/* Animated marquee of companies */}
+      <div className="marquee-wrap">
+        <div className="marquee-track">
+          {[...COMPANIES, ...COMPANIES].map((c, i) => (
+            <div key={i} className="marquee-item">
+              <img
+                src={`https://logo.clearbit.com/${c.domain}`}
+                alt={c.name}
+                onError={e => { e.target.style.display = 'none'; }}
+              />
+              <span>{c.name}</span>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-
-    <div className="features-section">
-      <h2 className="section-title">Why PlaceConnect?</h2>
-      <div className="features-grid">
-        {[
-          { icon: '📅', title: 'Year-wise Journey', desc: 'See exactly what seniors did in 1st, 2nd, 3rd and 4th year to land their dream job.', color: '#ede9fe' },
-          { icon: '💼', title: 'Real Companies', desc: 'Stories from Google, Microsoft, TCS, Infosys and 50+ more companies with real package details.', color: '#fce7f3' },
-          { icon: '💬', title: 'Ask the Senior', desc: 'Comment on stories and get direct replies from the placed senior themselves.', color: '#dbeafe' },
-          { icon: '🔗', title: 'LinkedIn Connect', desc: 'Connect directly with seniors on LinkedIn for mentorship and referrals.', color: '#d1fae5' },
-        ].map(f => (
-          <div key={f.title} className="feature-card" style={{ background: f.color }}>
-            <div className="feature-icon">{f.icon}</div>
-            <h3>{f.title}</h3>
-            <p>{f.desc}</p>
-          </div>
-        ))}
       </div>
     </div>
   </div>
