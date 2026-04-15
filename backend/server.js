@@ -5,8 +5,15 @@ const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/authRoutes');
-const storyRoutes = require('./routes/storyRoutes');
-const doubtRoutes = require('./routes/doubtRoutes');
+
+let storyRoutes, doubtRoutes;
+try {
+  storyRoutes = require('./routes/storyRoutes');
+  doubtRoutes = require('./routes/doubtRoutes');
+  console.log('Routes loaded successfully');
+} catch (e) {
+  console.error('Route loading error:', e.message);
+}
 
 connectDB();
 
@@ -16,8 +23,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
-app.use('/api/stories', storyRoutes);
-app.use('/api/doubts', doubtRoutes);
+if (storyRoutes) app.use('/api/stories', storyRoutes);
+if (doubtRoutes) app.use('/api/doubts', doubtRoutes);
 
 app.get('/', (req, res) => res.json({ message: 'PlaceConnect API', version: '2.0', routes: ['/health', '/api/auth', '/api/stories', '/api/doubts'] }));
 app.get('/health', (req, res) => res.json({ status: 'ok', message: 'PlaceConnect API v2 running', routes: ['/api/auth', '/api/stories', '/api/doubts'] }));
