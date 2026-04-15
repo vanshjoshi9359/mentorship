@@ -1,9 +1,8 @@
 const DayLog = require('../models/DayLog');
 const Groq = require('groq-sdk');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 const analyseWithAI = async (rawEntry, date) => {
+  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
   const prompt = `You are a personal time coach. Analyse this person's day journal entry and return a JSON response.
 
 Date: ${date}

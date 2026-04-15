@@ -1,10 +1,10 @@
 const Story = require('../models/Story');
 const Groq = require('groq-sdk');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 const generateSummary = async (story) => {
+  if (!process.env.GROQ_API_KEY) return '';
   try {
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
     const yearContent = story.years.map(y => `Year ${y.year}: ${y.content}`).join('\n\n');
     const prompt = `Summarise this placement journey in 3-4 bullet points. Be concise and highlight the most important advice and milestones.
 
