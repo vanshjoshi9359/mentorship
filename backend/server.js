@@ -4,6 +4,10 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 
+console.log('=== SERVER STARTING ===');
+console.log('__dirname:', __dirname);
+console.log('Node version:', process.version);
+
 const authRoutes = require('./routes/authRoutes');
 
 let storyRoutes, doubtRoutes;
