@@ -42,22 +42,6 @@ const Home = () => (
         <Link to="/stories" className="btn-hero-primary">📖 Explore Stories</Link>
         <Link to="/recommend" className="btn-hero-secondary">🤖 Find Growth Partner</Link>
       </div>
-
-      {/* Animated marquee of companies */}
-      <div className="marquee-wrap">
-        <div className="marquee-track">
-          {[...COMPANIES, ...COMPANIES].map((c, i) => (
-            <div key={i} className="marquee-item">
-              <img
-                src={`https://logo.clearbit.com/${c.domain}`}
-                alt={c.name}
-                onError={e => { e.target.style.display = 'none'; }}
-              />
-              <span>{c.name}</span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   </div>
 );
