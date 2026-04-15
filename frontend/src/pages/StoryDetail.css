@@ -52,3 +52,12 @@
 .tips-card { background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.2); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
 .tips-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 16px; color: #3fb950; }
 .tips-content { font-size: 16px; color: var(--text2); line-height: 1.8; white-space: pre-wrap; }
+
+.btn-delete-story {
+  display: flex; align-items: center; gap: 8px; padding: 10px 20px;
+  background: rgba(248,81,73,0.1); border: 1px solid rgba(248,81,73,0.3);
+  border-radius: 10px; color: var(--lost); font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s ease;
+}
+
+.btn-delete-story:hover { background: rgba(248,81,73,0.2); transform: translateY(-1px); }

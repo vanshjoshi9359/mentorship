@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import './StoryDetail.css';
@@ -32,6 +32,7 @@ const YEAR_EMOJIS = { 1: '🌱', 2: '📚', 3: '💻', 4: '🚀' };
 const StoryDetail = () => {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [upvoted, setUpvoted] = useState(false);
@@ -56,9 +57,20 @@ const StoryDetail = () => {
     } catch (e) { console.error(e); }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this story? This cannot be undone.')) return;
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/stories/${id}`);
+      navigate('/stories');
+    } catch (e) {
+      alert('Failed to delete story');
+    }
+  };
+
   if (loading) return <div className="loading">Loading story...</div>;
   if (!story) return <div className="error">Story not found</div>;
 
+  const isOwner = user && story.authorId?._id === user._id;
   const sortedYears = [...story.years].sort((a, b) => a.year - b.year);
 
   return (
@@ -91,6 +103,11 @@ const StoryDetail = () => {
           <button onClick={handleUpvote} className={`btn-upvote ${upvoted ? 'upvoted' : ''}`}>
             ❤️ {story.upvotes} {upvoted ? 'Liked' : 'Like'}
           </button>
+          {isOwner && (
+            <button onClick={handleDelete} className="btn-delete-story">
+              🗑️ Delete Story
+            </button>
+          )}
           <span className="story-author-info">
             By {story.authorId?.name} · {new Date(story.createdAt).toLocaleDateString()}
           </span>
