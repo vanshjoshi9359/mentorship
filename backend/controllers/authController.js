@@ -21,6 +21,11 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Only allow Gmail
+    if (!email.endsWith('@gmail.com')) {
+      return res.status(400).json({ message: 'Only Gmail addresses (@gmail.com) are allowed' });
+    }
+
     // Create user
     const user = await User.create({
       name,
@@ -58,6 +63,11 @@ const login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Only allow Gmail
+    if (!email.endsWith('@gmail.com')) {
+      return res.status(400).json({ message: 'Only Gmail addresses (@gmail.com) are allowed' });
     }
 
     // Check password
