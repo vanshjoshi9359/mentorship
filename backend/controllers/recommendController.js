@@ -86,6 +86,8 @@ TASK: Recommend the TOP 3 most relevant profiles. Consider:
 3. Someone who solved the same problem this student faces
 4. Batch/branch similarity for peer support
 
+IMPORTANT: Each recommendation must be a DIFFERENT person. Do NOT repeat the same profile. If there are fewer than 3 unique profiles, return only as many unique ones as available.
+
 Return ONLY valid JSON array (no markdown, no explanation):
 [
   {
@@ -110,7 +112,16 @@ Return ONLY valid JSON array (no markdown, no explanation):
       .replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
     const recommendations = JSON.parse(text);
-    res.json({ recommendations });
+
+    // Deduplicate by linkedIn URL
+    const seen = new Set();
+    const unique = recommendations.filter(r => {
+      if (!r.linkedIn || seen.has(r.linkedIn)) return false;
+      seen.add(r.linkedIn);
+      return true;
+    });
+
+    res.json({ recommendations: unique });
   } catch (error) {
     console.error('Recommend error:', error.message);
     res.status(500).json({ message: 'AI recommendation failed. Please try again.' });
