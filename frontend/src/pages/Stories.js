@@ -51,6 +51,8 @@ const Stories = () => {
   const [searchInput, setSearchInput] = useState('');
 
   useEffect(() => {
+    // Ping backend to wake it up on first load
+    fetch(`${process.env.REACT_APP_API_URL}/health`).catch(() => {});
     fetchStories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
@@ -86,7 +88,24 @@ const Stories = () => {
       </div>
 
       {loading ? (
-        <div className="loading">Loading stories...</div>
+        <div className="stories-grid">
+          {[1,2,3,4,5,6].map(i => (
+            <div key={i} className="story-card-skeleton">
+              <div className="skel-top">
+                <div className="skel-logo" />
+                <div className="skel-info">
+                  <div className="skel-line skel-title" />
+                  <div className="skel-line skel-sub" />
+                  <div className="skel-badges">
+                    <div className="skel-badge" /><div className="skel-badge" />
+                  </div>
+                </div>
+              </div>
+              <div className="skel-line skel-body" />
+              <div className="skel-line skel-body skel-short" />
+            </div>
+          ))}
+        </div>
       ) : stories.length === 0 ? (
         <div className="empty-state">
           <p>No stories yet. <Link to="/post-story">Be the first to share!</Link></p>
