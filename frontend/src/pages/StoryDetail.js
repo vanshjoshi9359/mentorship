@@ -112,7 +112,7 @@ const StoryDetail = () => {
 
         <div className="story-actions">
           <button onClick={handleUpvote} className={`btn-upvote ${upvoted ? 'upvoted' : ''}`}>
-            ❤️ {story.upvotes} {upvoted ? 'Liked' : 'Like'}
+            👍 {story.upvotes} {upvoted ? 'Liked' : 'Like'}
           </button>
           {story.linkedIn && (
             <a href={story.linkedIn} target="_blank" rel="noopener noreferrer" className="btn-linkedin">

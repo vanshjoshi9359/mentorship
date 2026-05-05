@@ -22,13 +22,13 @@
 
 .story-actions { display: flex; align-items: center; gap: 12px; padding-top: 20px; border-top: 1px solid #e0e7ff; flex-wrap: wrap; }
 
-.btn-upvote { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px; color: #ef4444; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
-.btn-upvote:hover, .btn-upvote.upvoted { background: #fee2e2; transform: translateY(-1px); }
+.btn-upvote { display: flex; align-items: center; gap: 8px; padding: 9px 18px; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 8px; color: #1d4ed8; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+.btn-upvote:hover, .btn-upvote.upvoted { background: #dbeafe; border-color: #93c5fd; }
 
-.btn-linkedin { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 12px; color: #2563eb; font-size: 14px; font-weight: 700; text-decoration: none; transition: all 0.2s ease; }
+.btn-linkedin { display: flex; align-items: center; gap: 8px; padding: 9px 18px; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 8px; color: #0077b5; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.2s ease; }
 .btn-linkedin:hover { background: #dbeafe; transform: translateY(-1px); }
 
-.btn-delete-story { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: #fff5f5; border: 2px solid #fecaca; border-radius: 12px; color: #ef4444; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
+.btn-delete-story { display: flex; align-items: center; gap: 8px; padding: 9px 18px; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; color: #dc2626; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
 .btn-delete-story:hover { background: #fee2e2; }
 
 .story-author-info { font-size: 13px; color: var(--text2); margin-left: auto; }

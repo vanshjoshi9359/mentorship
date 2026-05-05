@@ -13,7 +13,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          🎓 Connect
+          🎓 <span className="logo-accent">Connect</span>
           <span className="navbar-logo-sub">NIT Jalandhar Growth Community</span>
         </Link>
         <div className="navbar-menu">

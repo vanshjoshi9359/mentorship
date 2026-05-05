@@ -151,7 +151,7 @@ const Stories = () => {
               <div className="story-footer">
                 <span className="story-author">👤 {story.authorId?.name}</span>
                 <span>📅 {new Date(story.createdAt).toLocaleDateString()}</span>
-                <span className="story-upvotes">❤️ {story.upvotes}</span>
+                <span className="story-upvotes">👍 {story.upvotes} Likes</span>
               </div>
             </Link>
           ))}
