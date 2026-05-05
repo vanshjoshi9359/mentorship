@@ -121,7 +121,16 @@ Return ONLY valid JSON array (no markdown, no explanation):
       return true;
     });
 
-    res.json({ recommendations: unique });
+    // Attach real userId by matching linkedIn URL
+    const enriched = unique.map(rec => {
+      const match = profiles.find(p => p.linkedIn === rec.linkedIn);
+      return {
+        ...rec,
+        userId: match?.userId?._id || null
+      };
+    });
+
+    res.json({ recommendations: enriched });
   } catch (error) {
     console.error('Recommend error:', error.message);
     res.status(500).json({ message: 'AI recommendation failed. Please try again.' });
