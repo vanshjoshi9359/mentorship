@@ -31,17 +31,13 @@ const FloatingLogo = ({ company, style }) => {
 
 const Home = () => (
   <div className="home-page">
-    {/* Hero */}
-    <div className="hero">
-      <div className="hero-badge-wrap">
-        <span className="hero-badge-dot" />
-        <span>NIT Jalandhar Growth Community</span>
-      </div>
-
-      <div className="hero-cta">
-        <Link to="/stories" className="btn-hero-primary">📖 Explore Stories</Link>
-        <Link to="/recommend" className="btn-hero-secondary">🤖 Find Growth Partner</Link>
-      </div>
+    <div className="home-eyebrow">
+      <span className="home-eyebrow-dot" />
+      NIT Jalandhar Growth Community
+    </div>
+    <div className="home-cta">
+      <Link to="/stories" className="btn-hero-primary">Browse Stories →</Link>
+      <Link to="/recommend" className="btn-hero-secondary">✨ Find Growth Partner</Link>
     </div>
   </div>
 );

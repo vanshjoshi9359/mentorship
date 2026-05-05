@@ -13,23 +13,34 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          🎓 <span className="logo-accent">Connect</span>
-          <span className="navbar-logo-sub">NIT Jalandhar Growth Community</span>
+          <div className="navbar-logo-icon">🎓</div>
+          <div>
+            <span className="navbar-logo-text">Connect</span>
+            <span className="navbar-logo-sub">NIT Jalandhar</span>
+          </div>
         </Link>
-        <div className="navbar-menu">
-          <Link to="/stories" className={`navbar-link ${isActive('/stories') ? 'active' : ''}`}>📖 Stories</Link>
-          <Link to="/recommend" className={`navbar-link ${isActive('/recommend') ? 'active' : ''}`}>🤖 Recommend</Link>
+
+        <div className="navbar-center">
+          <Link to="/stories" className={`navbar-link ${isActive('/stories') ? 'active' : ''}`}>
+            <span>📖</span> Stories
+          </Link>
+          <Link to="/recommend" className={`navbar-link ${isActive('/recommend') ? 'active' : ''}`}>
+            <span>✨</span> Recommend
+          </Link>
+        </div>
+
+        <div className="navbar-right">
           {user ? (
             <>
               <Link to="/post-story" className="navbar-post-btn">+ Share Story</Link>
               <div className="navbar-user">
-                <div className="navbar-avatar">{user.name?.[0]?.toUpperCase()}</div>
                 <span className="navbar-username">{user.name?.split(' ')[0]}</span>
-                <button onClick={() => { logout(); navigate('/login'); }} className="navbar-logout">Logout</button>
+                <div className="navbar-avatar">{user.name?.[0]?.toUpperCase()}</div>
+                <button onClick={() => { logout(); navigate('/login'); }} className="navbar-logout">Out</button>
               </div>
             </>
           ) : (
-            <Link to="/login" className="navbar-post-btn">Login</Link>
+            <Link to="/login" className="navbar-post-btn">Sign In</Link>
           )}
         </div>
       </div>

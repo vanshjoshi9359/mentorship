@@ -45,17 +45,16 @@ const PostStory = () => {
 
   return (
     <div className="post-story-page">
-      <div className="post-container">
-        <div className="post-header">
-          <h1>🚀 Share Your Placement Story</h1>
-          <p className="post-subtitle">Inspire juniors by sharing your real journey. Your story matters!</p>
-        </div>
+      <div className="post-story-header">
+        <h1>Share Your Placement Story</h1>
+        <p>Help juniors by sharing your real journey. Your story matters.</p>
+      </div>
 
         <form onSubmit={handleSubmit}>
           {error && <div className="error-msg">⚠️ {error}</div>}
 
           <div className="form-section">
-            <h3 className="form-section-title">🏢 Company Details</h3>
+            <div className="form-section-label">🏢 Company Details</div>
             <div className="form-grid">
               <div className="form-group">
                 <label>Company *</label>
@@ -78,45 +77,56 @@ const PostStory = () => {
                 <input name="branch" value={form.branch} onChange={handleChange} placeholder="e.g. CSE, IT, ECE" />
               </div>
               <div className="form-group">
-                <label>🔗 LinkedIn Profile *</label>
+                <label>LinkedIn Profile *</label>
                 <input name="linkedIn" value={form.linkedIn} onChange={handleChange} required placeholder="https://linkedin.com/in/yourprofile" />
               </div>
             </div>
           </div>
 
           <div className="year-section">
-            <h3 className="form-section-title">📅 Year-wise Journey</h3>
+            <div className="form-section-label" style={{ marginBottom: 0 }}>📅 Year-wise Journey</div>
             {[1, 2, 3, 4].map(year => (
-              <div key={year} className="year-block" style={{ background: YEAR_COLORS[year], borderColor: YEAR_ACCENT[year] + '40' }}>
-                <h3 style={{ color: YEAR_ACCENT[year] }}>{YEAR_LABELS[year]}</h3>
+              <div key={year} className="year-block" style={{ background: YEAR_COLORS[year], borderColor: YEAR_ACCENT[year] + '50' }}>
+                <div className="year-block-header">
+                  <div className="year-block-num" style={{ background: YEAR_ACCENT[year] }}>{year}</div>
+                  <span className="year-block-title" style={{ color: YEAR_ACCENT[year] }}>{YEAR_LABELS[year]}</span>
+                </div>
                 <div className="year-prompts">
                   {YEAR_PROMPTS[year].map(p => (
-                    <button key={p} type="button" className="year-prompt" style={{ borderColor: YEAR_ACCENT[year] + '60', color: YEAR_ACCENT[year] }} onClick={() => addPrompt(year, p)}>+ {p}</button>
+                    <button key={p} type="button" className="year-prompt"
+                      style={{ borderColor: YEAR_ACCENT[year] + '60', color: YEAR_ACCENT[year] }}
+                      onClick={() => addPrompt(year, p)}>+ {p}</button>
                   ))}
                 </div>
                 <textarea
                   value={years[year]}
                   onChange={e => setYears(prev => ({ ...prev, [year]: e.target.value }))}
                   placeholder={`What did you do in your ${YEAR_LABELS[year]}?`}
-                  rows="5"
+                  rows="4"
                 />
               </div>
             ))}
           </div>
 
-          <div className="form-group" style={{ marginTop: '24px' }}>
-            <label>💡 Final Tips for Juniors</label>
-            <textarea name="tips" value={form.tips} onChange={handleChange} placeholder="What advice would you give to juniors starting their placement journey?" rows="4" />
+          <div className="form-section">
+            <div className="form-section-label">💡 Tips for Juniors</div>
+            <textarea name="tips" value={form.tips} onChange={handleChange}
+              placeholder="What advice would you give to juniors starting their placement journey?"
+              rows="4" style={{ width: '100%' }} />
+          </div>
+
+          <div className="ai-notice">
+            <span>✨</span>
+            <span><strong>AI Logo Detection:</strong> After posting, AI will automatically fetch your company's logo to display on your story card.</span>
           </div>
 
           <div className="form-actions">
             <button type="button" className="btn-cancel" onClick={() => navigate('/stories')}>Cancel</button>
             <button type="submit" disabled={loading} className="btn-submit">
-              {loading ? '⏳ Posting...' : '🚀 Share My Story'}
+              {loading ? 'Posting...' : 'Share My Story →'}
             </button>
           </div>
         </form>
-      </div>
     </div>
   );
 };
